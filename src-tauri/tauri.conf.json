@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "galle-partpicker",
+    "productName": "order-assembly-tool",
     "version": "0.0.0"
   },
   "tauri": {
@@ -36,7 +36,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "galle-partpicker",
+        "title": "Order Assembly Tool",
         "width": 800,
         "height": 600
       }
