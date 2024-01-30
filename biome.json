@@ -31,17 +31,19 @@
     "lineWidth": 80,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineEnding": "lf"
+    "lineEnding": "lf",
+    "formatWithErrors": true
   },
   "javascript": {
     "formatter": {
-      "arrowParentheses": "asNeeded",
+      "quoteStyle": "single",
       "jsxQuoteStyle": "single",
-      "semicolons": "always",
-      "trailingComma": "es5",
       "quoteProperties": "asNeeded",
-      "bracketSpacing": true,
-      "bracketSameLine": false
+      "trailingComma": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": false,
+      "bracketSpacing": true
     }
   }
 }

@@ -1,9 +1,9 @@
 [package]
-name = "galle-partpicker"
+name = "order-assembly-tool"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
+description = "Order Assembly Tool written using Tauri & React"
+authors = ["gallejens"]
+license = "MIT"
 repository = ""
 edition = "2021"
 
@@ -21,3 +21,8 @@ serde_json = "1.0"
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[dependencies.tauri-plugin-sql]
+git = "https://github.com/tauri-apps/plugins-workspace"
+branch = "v1"
+features = ["sqlite"]

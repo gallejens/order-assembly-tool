@@ -11,12 +11,14 @@
     "format": "pnpm dlx @biomejs/biome check --apply ."
   },
   "dependencies": {
-    "@mantine/core": "^7.3.2",
-    "@mantine/hooks": "^7.3.2",
-    "@mantine/notifications": "^7.3.2",
+    "@mantine/core": "7.5.0",
+    "@mantine/hooks": "7.5.0",
+    "@mantine/notifications": "7.5.0",
+    "@tabler/icons-react": "^2.46.0",
     "@tauri-apps/api": "^1.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
@@ -26,8 +28,9 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",
     "postcss": "^8.4.32",
-    "postcss-preset-mantine": "^1.11.1",
+    "postcss-preset-mantine": "1.12.3",
     "postcss-simple-vars": "^7.0.1",
+    "sass": "^1.70.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.4"
   }
