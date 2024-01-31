@@ -1,10 +1,8 @@
-import { Tooltip, UnstyledButton } from '@mantine/core';
-import {
-  IconHome,
-  IconPlus,
-  IconTestPipe,
-  TablerIconsProps,
-} from '@tabler/icons-react';
+import { PAGES } from '@/constants';
+import { useMainStore } from '@/stores/useMainStore';
+import { ObjEntries } from '@/types/util';
+import { Tooltip, UnstyledButton, useMantineColorScheme } from '@mantine/core';
+import { IconMoon, IconSun, TablerIconsProps } from '@tabler/icons-react';
 import { FC } from 'react';
 import styles from './navbar.module.scss';
 
@@ -32,31 +30,32 @@ const NavbarButton: FC<{
 };
 
 export const Navbar: FC = () => {
+  const { activePage, setActivePage } = useMainStore();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+
+  const usingDarkMode = colorScheme === 'dark';
+
   return (
     <div className={styles.navbar}>
       <div className={styles.list}>
-        <NavbarButton
-          label='Home'
-          onClick={() => {
-            console.log('home');
-          }}
-          icon={IconHome}
-          active
-        />
-        <NavbarButton
-          label='Create'
-          onClick={() => {
-            console.log('create');
-          }}
-          icon={IconPlus}
-        />
+        {(Object.entries(PAGES) as ObjEntries<typeof PAGES>).map(
+          ([page, { label, icon }]) => (
+            <NavbarButton
+              key={page}
+              label={label}
+              icon={icon}
+              onClick={() => {
+                setActivePage(page);
+              }}
+              active={activePage === page}
+            />
+          )
+        )}
       </div>
       <NavbarButton
-        label='Test'
-        onClick={() => {
-          console.log('test');
-        }}
-        icon={IconTestPipe}
+        label={usingDarkMode ? 'Light Mode' : 'Dark Mode'}
+        onClick={toggleColorScheme}
+        icon={usingDarkMode ? IconSun : IconMoon}
       />
     </div>
   );

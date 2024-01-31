@@ -1,14 +1,16 @@
+import { Page } from '@/constants';
 import { create } from 'zustand';
 
 type MainState = {
-  count: number;
+  activePage: Page;
 };
 
 type MainStateActions = {
-  increaseCount: () => void;
+  setActivePage: (page: Page) => void;
 };
 
 export const useMainStore = create<MainState & MainStateActions>(set => ({
-  count: 0,
-  increaseCount: () => set(s => ({ count: s.count + 1 })),
+  activePage: 'home',
+  setActivePage: page => set({ activePage: page }),
 }));
+
