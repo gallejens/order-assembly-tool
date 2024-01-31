@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { App } from './App';
 
 import '@mantine/core/styles.css';
-import './lib/db';
 import './styles/main.scss';
 
 const rootElement = document.getElementById('root');

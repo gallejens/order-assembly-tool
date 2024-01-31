@@ -1,3 +1,7 @@
 export namespace Database {
-  export type UserTable = {};
+  export type GroupsTable = {
+    id: number;
+    label: string;
+  };
 }
+

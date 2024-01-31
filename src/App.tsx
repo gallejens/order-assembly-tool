@@ -1,9 +1,10 @@
 import { MantineProvider } from '@mantine/core';
 import { FC } from 'react';
 import { Navbar } from './components/navbar';
-import { ActivePage } from './components/pages';
+import { ActivePage } from './pages';
 import { theme } from './theme';
 
+import { Notifications } from './components/notifications';
 import styles from './styles/app.module.scss';
 
 export const App: FC = () => {
@@ -13,6 +14,7 @@ export const App: FC = () => {
         <Navbar />
         <ActivePage />
       </div>
+      <Notifications />
     </MantineProvider>
   );
 };

@@ -1,8 +1,6 @@
 import { PAGES } from '@/constants';
 import { useMainStore } from '@/stores/useMainStore';
 import { FC } from 'react';
-import { GroupsPage } from './groups';
-import { OrderPage } from './order';
 
 import styles from './page.module.scss';
 
@@ -17,5 +15,3 @@ export const ActivePage: FC = () => {
     </div>
   );
 };
-
-export { GroupsPage, OrderPage };

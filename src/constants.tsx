@@ -4,8 +4,9 @@ import {
   IconTruckDelivery,
   TablerIconsProps,
 } from '@tabler/icons-react';
-import { GroupsPage, OrderPage } from './components/pages';
-import { HomePage } from './components/pages/home';
+import { GroupsPage } from './pages/groups';
+import { HomePage } from './pages/home';
+import { OrderPage } from './pages/order';
 
 export type Page = keyof typeof PAGES;
 

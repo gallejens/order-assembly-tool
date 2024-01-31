@@ -2,10 +2,12 @@ import Database from 'tauri-plugin-sql-api';
 
 const getDb = async () => {
   if (!window.__TAURI__) {
-    throw new Error('Cannot access DB inside browser');
+    console.warn('Cannot access DB inside browser');
+    return new Database('');
   }
 
-  return Database.load('sqlite:test.db');
+  return Database.load('sqlite:data.db');
 };
 
-export const db = getDb();
+export const db = await getDb();
+
