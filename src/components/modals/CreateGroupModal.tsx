@@ -1,9 +1,9 @@
-import { Modal } from '@/components/modals';
 import { notifications } from '@/components/notifications';
 import { db } from '@/lib/db';
 import { Button, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FC } from 'react';
+import { Modal } from '.';
 
 type FormValues = {
   name: string;

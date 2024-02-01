@@ -1,55 +1,61 @@
-.groups_page {
+.groups_list {
+  min-width: 150px;
+  width: 15rem;
+  height: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: var(--mantine-spacing-sm);
-  padding: var(--mantine-spacing-sm);
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-xs);
 
-  & > .grid_item {
+  border-right: 1px solid var(--mantine-color-default-border);
+
+  & > * {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     width: 100%;
-    height: 6rem;
-
-    background-color: light-dark(
-      var(--mantine-color-gray-2),
-      var(--mantine-color-dark-6)
-    );
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-md);
-
-    font-size: 1.3rem;
-    padding: var(--mantine-spacing-sm);
-    overflow: hidden;
-
-    // &:hover {
-    //   background-color: light-dark(
-    //     var(--mantine-color-gray-3),
-    //     var(--mantine-color-dark-5)
-    //   );
-    // }
   }
-}
 
-.create_button {
-  position: absolute;
-  right: var(--mantine-spacing-md);
-  bottom: var(--mantine-spacing-md);
+  & > .header {
+    padding-bottom: var(--mantine-spacing-xs);
+    border-bottom: 1px solid var(--mantine-color-default-border);
+  }
 
-  width: 3.5rem;
-  aspect-ratio: 1;
+  & .list {
+    flex-direction: column;
+    gap: var(--mantine-spacing-xs);
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    overflow: auto;
 
-  background-color: var(--mantine-color-primary-6) !important;
-  border-radius: 100%;
+    & > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-  &:hover {
-    background-color: var(--mantine-color-primary-7) !important;
+      width: inherit;
+      height: 2rem;
+      flex-shrink: 0;
+
+      background-color: light-dark(
+        var(--mantine-color-gray-2),
+        var(--mantine-color-dark-6)
+      );
+      border: 1px solid var(--mantine-color-default-border);
+      border-radius: var(--mantine-radius-md);
+
+      padding: 0 var(--mantine-spacing-xs);
+      overflow: hidden;
+
+      &:hover {
+        background-color: light-dark(
+          var(--mantine-color-gray-3),
+          var(--mantine-color-dark-5)
+        );
+      }
+    }
   }
 }

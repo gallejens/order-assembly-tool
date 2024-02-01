@@ -1,6 +1,9 @@
 import { useMainStore } from '@/stores/useMainStore';
 import { Modal as MantineModal } from '@mantine/core';
 import { FC, PropsWithChildren } from 'react';
+import { ConfirmModal } from './ConfirmModal';
+import { CreateGroupModal } from './CreateGroupModal';
+import { RetypConfirmModal } from './RetypConfirmModal';
 
 export const Modals: FC = () => {
   const { modal } = useMainStore();
@@ -34,3 +37,5 @@ export const Modal: FC<
     </MantineModal>
   );
 };
+
+export { ConfirmModal, CreateGroupModal, RetypConfirmModal };
