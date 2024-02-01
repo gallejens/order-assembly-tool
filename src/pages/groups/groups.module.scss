@@ -9,7 +9,7 @@
   & > .grid_item {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
 
     width: 100%;
     height: 6rem;
@@ -25,12 +25,12 @@
     padding: var(--mantine-spacing-sm);
     overflow: hidden;
 
-    &:hover {
-      background-color: light-dark(
-        var(--mantine-color-gray-3),
-        var(--mantine-color-dark-5)
-      );
-    }
+    // &:hover {
+    //   background-color: light-dark(
+    //     var(--mantine-color-gray-3),
+    //     var(--mantine-color-dark-5)
+    //   );
+    // }
   }
 }
 

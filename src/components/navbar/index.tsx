@@ -1,33 +1,11 @@
 import { PAGES } from '@/constants';
 import { useMainStore } from '@/stores/useMainStore';
 import { ObjEntries } from '@/types/util';
-import { Tooltip, UnstyledButton, useMantineColorScheme } from '@mantine/core';
-import { IconMoon, IconSun, TablerIconsProps } from '@tabler/icons-react';
+import { useMantineColorScheme } from '@mantine/core';
+import { IconMoon, IconSun } from '@tabler/icons-react';
 import { FC } from 'react';
+import { IconButton } from '../iconbutton';
 import styles from './navbar.module.scss';
-
-const NavbarButton: FC<{
-  label: string;
-  onClick: () => void;
-  icon: React.ComponentType<TablerIconsProps>;
-  active?: boolean;
-}> = props => {
-  return (
-    <Tooltip
-      label={props.label}
-      position='right'
-      transitionProps={{ duration: 0 }}
-    >
-      <UnstyledButton
-        onClick={props.onClick}
-        className={styles.button}
-        data-active={!!props.active}
-      >
-        <props.icon stroke={1.5} />
-      </UnstyledButton>
-    </Tooltip>
-  );
-};
 
 export const Navbar: FC = () => {
   const { activePage, setActivePage } = useMainStore();
@@ -40,22 +18,27 @@ export const Navbar: FC = () => {
       <div className={styles.list}>
         {(Object.entries(PAGES) as ObjEntries<typeof PAGES>).map(
           ([page, { label, icon }]) => (
-            <NavbarButton
+            <IconButton
               key={page}
-              label={label}
+              tooltip={{ label, position: 'right' }}
               icon={icon}
               onClick={() => {
                 setActivePage(page);
               }}
               active={activePage === page}
+              size={'calc(100% - 1rem)'}
             />
           )
         )}
       </div>
-      <NavbarButton
-        label={usingDarkMode ? 'Light Mode' : 'Dark Mode'}
+      <IconButton
+        tooltip={{
+          label: usingDarkMode ? 'Light Mode' : 'Dark Mode',
+          position: 'right',
+        }}
         onClick={toggleColorScheme}
         icon={usingDarkMode ? IconSun : IconMoon}
+        size={'calc(100% - 1rem)'}
       />
     </div>
   );
