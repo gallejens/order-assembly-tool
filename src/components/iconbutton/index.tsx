@@ -1,6 +1,6 @@
 import { Tooltip, TooltipProps, UnstyledButton } from '@mantine/core';
 import { TablerIconsProps } from '@tabler/icons-react';
-import { FC } from 'react';
+import { FC, type MouseEvent } from 'react';
 
 import styles from './iconbutton.module.scss';
 
@@ -16,9 +16,14 @@ type Props = {
 };
 
 export const IconButton: FC<Props> = props => {
-  const button = (
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    props.onClick();
+  };
+
+  const buttonElement = (
     <UnstyledButton
-      onClick={props.onClick}
+      onClick={handleClick}
       className={styles.icon_button}
       data-active={!!props.active}
       style={{ width: props.size }}
@@ -28,7 +33,7 @@ export const IconButton: FC<Props> = props => {
   );
 
   return props.tooltip === undefined ? (
-    button
+    buttonElement
   ) : (
     <Tooltip
       label={props.tooltip.label}
@@ -37,7 +42,7 @@ export const IconButton: FC<Props> = props => {
       withArrow
       arrowSize={6}
     >
-      {button}
+      {buttonElement}
     </Tooltip>
   );
 };

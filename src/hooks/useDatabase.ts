@@ -20,7 +20,9 @@ export const useDatabase = <T>(
   useEffect(() => {
     if (!window.__TAURI__) throw new Error('Cannot access DB inside browser');
 
-    select();
+    setTimeout(() => {
+      select();
+    }, 500);
   }, []);
 
   return {

@@ -20,6 +20,9 @@ dependencies:
   '@tauri-apps/api':
     specifier: ^1.5.2
     version: 1.5.2
+  classnames:
+    specifier: ^2.5.1
+    version: 2.5.1
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -982,6 +985,10 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
+
+  /classnames@2.5.1:
+    resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
+    dev: false
 
   /clsx@2.0.0:
     resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
