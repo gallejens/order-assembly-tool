@@ -2,6 +2,7 @@ import { Tooltip, TooltipProps, UnstyledButton } from '@mantine/core';
 import { TablerIconsProps } from '@tabler/icons-react';
 import { FC, type MouseEvent } from 'react';
 
+import classNames from 'classnames';
 import styles from './iconbutton.module.scss';
 
 type Props = {
@@ -24,8 +25,7 @@ export const IconButton: FC<Props> = props => {
   const buttonElement = (
     <UnstyledButton
       onClick={handleClick}
-      className={styles.icon_button}
-      data-active={!!props.active}
+      className={classNames(styles.icon_button, props.active && 'selected')}
       style={{ width: props.size }}
     >
       <props.icon stroke={1.5} />

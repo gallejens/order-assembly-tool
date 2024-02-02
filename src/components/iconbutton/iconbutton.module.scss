@@ -1,31 +1,19 @@
 .icon_button {
   aspect-ratio: 1;
+  min-height: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--mantine-radius-md);
+  border-radius: var(--mantine-radius-sm);
 
   color: light-dark(var(--mantine-color-dark-6), var(--mantine-color-gray-1));
 
-  &[data-active='false'] {
-    &:hover {
-      background-color: light-dark(
-        var(--mantine-color-gray-3),
-        var(--mantine-color-dark-5)
-      );
-      border: 1px solid var(--mantine-color-default-border);
-    }
-  }
-
-  &[data-active='true'] {
-    background-color: var(--mantine-color-primary-6);
-
-    &:hover {
-      color: light-dark(
-        var(--mantine-color-gray-3),
-        var(--mantine-color-dark-5)
-      );
-    }
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-3),
+      var(--mantine-color-dark-5)
+    );
+    border: 1px solid var(--mantine-color-default-border);
   }
 }
