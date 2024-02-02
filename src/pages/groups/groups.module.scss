@@ -1,62 +1,89 @@
 .groups_list {
-  height: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: var(--mantine-spacing-xs);
+  gap: var(--mantine-spacing-xs);
 
-  & > * {
-    width: 100%;
+  // this checks the loader
+  &:has(span) {
+    overflow: hidden;
+  }
+
+  & > div {
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
 
-  & > .header {
-    padding-bottom: var(--mantine-spacing-xs);
-    border-bottom: 1px solid var(--mantine-color-default-border);
-    margin-bottom: var(--mantine-spacing-xs);
-  }
+    width: inherit;
+    height: 2rem;
+    flex-shrink: 0;
 
-  & .list {
-    flex-direction: column;
-    gap: var(--mantine-spacing-xs);
+    padding: 0 var(--mantine-spacing-xs);
+    overflow: hidden;
 
-    overflow: auto;
+    background-color: light-dark(
+      var(--mantine-color-gray-2),
+      var(--mantine-color-dark-6)
+    );
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
 
-    // this checks the loader
-    &:has(span) {
-      overflow: hidden;
+    &:hover {
+      background-color: light-dark(
+        var(--mantine-color-gray-3),
+        var(--mantine-color-dark-5)
+      );
+      cursor: pointer;
     }
+  }
+}
 
-    & > div {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+.items_list {
+  position: relative;
 
-      width: inherit;
-      height: 2rem;
-      flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
 
-      padding: 0 var(--mantine-spacing-xs);
-      overflow: hidden;
+  & > .tree {
+    $line-height: 26px;
+    $horizontal-margin: 15px;
 
+    @mixin entry {
+      position: absolute;
+      content: '';
       background-color: light-dark(
         var(--mantine-color-gray-2),
-        var(--mantine-color-dark-6)
+        var(--mantine-color-dark-5)
       );
-      border: 1px solid var(--mantine-color-default-border);
-      border-radius: var(--mantine-radius-sm);
+    }
 
-      &:hover {
-        background-color: light-dark(
-          var(--mantine-color-gray-3),
-          var(--mantine-color-dark-5)
-        );
-        cursor: pointer;
-      }
+    div {
+      position: relative;
+      margin-left: $horizontal-margin;
+      line-height: $line-height;
+    }
+
+    p::before {
+      @include entry;
+      width: 10px;
+      height: 2px;
+      top: calc($line-height / 2);
+      left: calc($horizontal-margin * -1);
+    }
+
+    div:before {
+      @include entry;
+      height: 100%;
+      width: 2px;
+      top: 0;
+      left: calc($horizontal-margin * -1);
+    }
+
+    div:last-child::before {
+      height: calc($line-height / 2);
     }
   }
 }

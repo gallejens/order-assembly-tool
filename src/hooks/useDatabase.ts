@@ -1,34 +1,62 @@
 import { db } from '@/lib/db';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Database from 'tauri-plugin-sql-api';
 
 type DatabaseSelectType = Parameters<InstanceType<typeof Database>['select']>;
 
+const ARTIFICIAL_DELAY = 500;
+
 export const useDatabase = <T>(
-  ...[query, values]: DatabaseSelectType
+  ...[query, values = []]: DatabaseSelectType
 ): {
-  refresh: () => void;
+  refresh: () => Promise<void>;
   data: T | null;
 } => {
   const [data, setData] = useState<T | null>(null);
+  const promiseResolveRej = useRef<(() => void) | null>(null);
 
-  const select = async () => {
-    const result: T = await db.select(query, values);
-    setData(result);
+  const executeQuery = async () => {
+    const promise = new Promise<T | null>((res, rej) => {
+      let timeout: number | null = null;
+
+      promiseResolveRej.current = () => {
+        if (timeout !== null) {
+          clearTimeout(timeout);
+        }
+        rej('Cancelled');
+      };
+
+      db.select<T>(query, values).then(result => {
+        timeout = setTimeout(() => {
+          res(result);
+        }, ARTIFICIAL_DELAY);
+      });
+    });
+
+    try {
+      const result = await promise;
+      setData(result);
+      promiseResolveRej.current = null;
+    } catch (e: unknown) {
+      //
+    }
   };
 
   useEffect(() => {
     if (!window.__TAURI__) throw new Error('Cannot access DB inside browser');
 
-    setTimeout(() => {
-      select();
-    }, 500);
-  }, []);
+    setData(null);
+    executeQuery();
+
+    return () => {
+      if (promiseResolveRej.current) {
+        promiseResolveRej.current();
+      }
+    };
+  }, [...values]);
 
   return {
-    refresh: () => {
-      select();
-    },
+    refresh: executeQuery,
     data,
   };
 };

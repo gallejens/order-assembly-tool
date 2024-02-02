@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod migrations;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -12,8 +13,8 @@ fn greet(name: &str) -> String {
 fn main() {
     let migrations = vec![Migration {
         version: 1,
-        description: "create_group_table",
-        sql: "CREATE TABLE IF NOT EXISTS groups (id INTEGER PRIMARY KEY AUTOINCREMENT, label VARCHAR(255));",
+        description: "create_initial_tables",
+        sql: migrations::MIGRATIONS,
         kind: MigrationKind::Up,
     }];
 
