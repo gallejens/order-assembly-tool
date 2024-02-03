@@ -9,7 +9,7 @@ export const GroupsPage: FC = () => {
 
   return (
     <>
-      <GroupsList selected={selectedGroup} onClick={setSelectedGroup} />
+      <GroupsList selected={selectedGroup} setSelected={setSelectedGroup} />
       {selectedGroup === null ? (
         <div className='fullcenter'>
           <Text size='lg'>Select a group to continue</Text>
@@ -19,7 +19,7 @@ export const GroupsPage: FC = () => {
           <ItemsList
             groupId={selectedGroup}
             selected={selectedItem}
-            onClick={setSelectedItem}
+            setSelected={setSelectedItem}
           />
           {selectedItem === null ? (
             <div className='fullcenter'>

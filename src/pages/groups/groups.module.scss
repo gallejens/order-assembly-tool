@@ -9,81 +9,93 @@
   &:has(span) {
     overflow: hidden;
   }
-
-  & > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    width: inherit;
-    height: 2rem;
-    flex-shrink: 0;
-
-    padding: 0 var(--mantine-spacing-xs);
-    overflow: hidden;
-
-    background-color: light-dark(
-      var(--mantine-color-gray-2),
-      var(--mantine-color-dark-6)
-    );
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
-
-    &:hover {
-      background-color: light-dark(
-        var(--mantine-color-gray-3),
-        var(--mantine-color-dark-5)
-      );
-      cursor: pointer;
-    }
-  }
 }
 
 .items_list {
-  position: relative;
-
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: center;
 
+  // ALERT
+  // This whole class is a mess of calculations to perfectly align the treelines
+  // I'm not proud of it, but it works
   & > .tree {
-    $line-height: 26px;
-    $horizontal-margin: 15px;
+    width: 100%;
 
-    @mixin entry {
-      position: absolute;
-      content: '';
-      background-color: light-dark(
-        var(--mantine-color-gray-2),
-        var(--mantine-color-dark-5)
-      );
-    }
-
-    div {
+    & > .children {
       position: relative;
-      margin-left: $horizontal-margin;
-      line-height: $line-height;
-    }
 
-    p::before {
-      @include entry;
-      width: 10px;
-      height: 2px;
-      top: calc($line-height / 2);
-      left: calc($horizontal-margin * -1);
-    }
+      $box-height: 30px;
+      $margin-left: 20px;
+      $margin-bottom: 5px;
+      $line-width: 2px;
 
-    div:before {
-      @include entry;
-      height: 100%;
-      width: 2px;
-      top: 0;
-      left: calc($horizontal-margin * -1);
-    }
+      // dividers
+      &:not(:last-child) {
+        padding-bottom: $margin-bottom;
+        margin-bottom: calc($margin-bottom * 2);
+        border-bottom: 1px solid var(--mantine-color-default-border);
+      }
 
-    div:last-child::before {
-      height: calc($line-height / 2);
+      @mixin tree_generic {
+        position: absolute;
+        content: '';
+        background-color: var(--mantine-color-default-border);
+      }
+
+      & .children {
+        position: relative;
+        width: calc(100% - $margin-left);
+        margin-left: $margin-left;
+        line-height: $box-height;
+      }
+
+      & .tree_item {
+        margin-bottom: $margin-bottom;
+        height: $box-height;
+      }
+
+      // quarter circle
+      & .tree_item::before {
+        @include tree_generic;
+
+        background-color: transparent !important;
+        width: calc($margin-left / 2);
+        height: calc($margin-left / 2);
+        top: calc(
+          $box-height / 2 - $margin-left / 2 + $line-width / 2
+        ); // make border middle of box
+        left: calc($margin-left / -2);
+
+        border-bottom-left-radius: 50%;
+        border-width: $line-width;
+        border-color: var(--mantine-color-default-border);
+        border-style: none none solid solid;
+      }
+
+      // vertical lines
+      & .children:before {
+        @include tree_generic;
+
+        height: calc(100% + $margin-bottom + $box-height / 2);
+        width: $line-width;
+        top: calc($margin-bottom * -1);
+        left: calc($margin-left / -2);
+      }
+
+      & .children:last-child::before {
+        height: calc(
+          $margin-bottom +
+            ($box-height / 2 - $margin-left / 2 + $line-width / 2)
+        );
+      }
     }
+  }
+
+  & .button_group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mantine-spacing-xs);
   }
 }

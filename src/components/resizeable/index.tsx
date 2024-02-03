@@ -8,7 +8,7 @@ type Direction = 'right' | 'bottom';
 type Props = {
   initialWidth?: string;
   initialHeight?: string;
-  maxWith?: string;
+  maxWidth?: string;
   maxHeight?: string;
   minWidth?: string;
   minHeight?: string;
@@ -60,7 +60,7 @@ export const Resizeable: FC<PropsWithChildren<Props>> = props => {
 
       if (props.storageKey && dirRef.current !== null) {
         const value =
-          containerRef.current!.style[DIRECTION_INFO[dirRef.current].styleKey];
+          containerRef.current.style[DIRECTION_INFO[dirRef.current].styleKey];
         localStorage.setItem(
           `resizeable-${DIRECTION_INFO[dirRef.current].styleKey}-${
             props.storageKey
@@ -99,7 +99,7 @@ export const Resizeable: FC<PropsWithChildren<Props>> = props => {
       style={{
         width: props.initialWidth,
         height: props.initialHeight,
-        maxWidth: props.maxWith,
+        maxWidth: props.maxWidth,
         maxHeight: props.maxHeight,
         minWidth: props.minWidth,
         minHeight: props.minHeight,

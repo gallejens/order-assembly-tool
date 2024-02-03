@@ -4,7 +4,7 @@ import Database from 'tauri-plugin-sql-api';
 
 type DatabaseSelectType = Parameters<InstanceType<typeof Database>['select']>;
 
-const ARTIFICIAL_DELAY = 500;
+const ARTIFICIAL_DELAY = 0;
 
 export const useDatabase = <T>(
   ...[query, values = []]: DatabaseSelectType

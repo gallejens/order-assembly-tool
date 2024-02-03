@@ -1,6 +1,7 @@
+import { Box } from '@/components/box';
 import { IconButton } from '@/components/iconbutton';
-import { CreateGroupModal } from '@/components/modals/CreateGroupModal';
 import { RetypConfirmModal } from '@/components/modals/RetypConfirmModal';
+import { TextInputModal } from '@/components/modals/TextInputModal';
 import { notifications } from '@/components/notifications';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
@@ -9,13 +10,12 @@ import { useMainStore } from '@/stores/useMainStore';
 import type { Database } from '@/types/db';
 import { Loader, Text } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import classNames from 'classnames';
 import type { FC } from 'react';
 import styles from '../groups.module.scss';
 
 type Props = {
   selected: number | null;
-  onClick: (id: number) => void;
+  setSelected: (id: number | null) => void;
 };
 
 export const GroupsList: FC<Props> = props => {
@@ -30,7 +30,7 @@ export const GroupsList: FC<Props> = props => {
 
     openModal(
       <RetypConfirmModal
-        title='Removing Group'
+        title='Removing group, all items in this group will also be deleted!'
         confirmValue={group.label}
         onConfirm={async () => {
           closeModal();
@@ -41,6 +41,10 @@ export const GroupsList: FC<Props> = props => {
             autoClose: 3000,
           });
           refresh();
+
+          if (props.selected === id) {
+            props.setSelected(null);
+          }
         }}
       />
     );
@@ -48,7 +52,10 @@ export const GroupsList: FC<Props> = props => {
 
   const handleCreateGroup = () => {
     openModal(
-      <CreateGroupModal
+      <TextInputModal
+        title='Create a new group'
+        inputLabel='Name'
+        buttonLabel='Create'
         onConfirm={async label => {
           closeModal();
           await db.execute('INSERT INTO groups (label) VALUES ($1)', [label]);
@@ -79,12 +86,12 @@ export const GroupsList: FC<Props> = props => {
         </span>
       ) : (
         groups.map(group => (
-          <div
+          <Box
             key={`group-${group.id}`}
             onClick={() => {
-              props.onClick(group.id);
+              props.setSelected(group.id);
             }}
-            className={classNames(props.selected === group.id && 'selected')}
+            selected={props.selected === group.id}
           >
             <Text size='md'>{group.label}</Text>
             <IconButton
@@ -94,7 +101,7 @@ export const GroupsList: FC<Props> = props => {
               icon={IconTrash}
               size='1.1rem'
             />
-          </div>
+          </Box>
         ))
       )}
     </Sidebar>

@@ -15,9 +15,6 @@
         "noForEach": "off",
         "noBannedTypes": "off"
       },
-      "style": {
-        "noNonNullAssertion": "off"
-      },
       "a11y": {
         "useKeyWithClickEvents": "off"
       },

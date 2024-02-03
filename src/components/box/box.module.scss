@@ -1,0 +1,25 @@
+.box {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 var(--mantine-spacing-xs);
+  overflow: hidden;
+
+  background-color: light-dark(
+    var(--mantine-color-gray-2),
+    var(--mantine-color-dark-6)
+  );
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-sm);
+
+  &:hover {
+    background-color: light-dark(
+      var(--mantine-color-gray-3),
+      var(--mantine-color-dark-5)
+    );
+    cursor: pointer;
+  }
+}

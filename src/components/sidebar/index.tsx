@@ -21,8 +21,8 @@ export const Sidebar: FC<PropsWithChildren<Props>> = props => {
       direction={{ right: true }}
       className={styles.sidebar}
       initialWidth='250px'
-      minWidth='150px'
-      maxWith='350px'
+      minWidth='200px'
+      maxWidth='400px'
       storageKey={props.sizeStorageKey}
     >
       <div className={styles.header}>

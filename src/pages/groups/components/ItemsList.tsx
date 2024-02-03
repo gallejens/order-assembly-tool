@@ -1,4 +1,6 @@
-import { CreateGroupModal } from '@/components/modals';
+import { Box } from '@/components/box';
+import { IconButton } from '@/components/iconbutton';
+import { RetypConfirmModal, TextInputModal } from '@/components/modals';
 import { notifications } from '@/components/notifications';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
@@ -6,14 +8,14 @@ import { db } from '@/lib/db';
 import { useMainStore } from '@/stores/useMainStore';
 import type { Database } from '@/types/db';
 import { Loader, Text } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 import type { FC } from 'react';
 import styles from '../groups.module.scss';
 
 type Props = {
   groupId: number;
   selected: number | null;
-  onClick: (id: number) => void;
+  setSelected: (id: number | null) => void;
 };
 
 type QueryResult = Omit<Database.ItemsTable, 'groupId'>[];
@@ -83,7 +85,10 @@ export const ItemsList: FC<Props> = props => {
 
   const handleCreateItem = (parentId: number | null = null) => {
     openModal(
-      <CreateGroupModal
+      <TextInputModal
+        title='Create a new item'
+        inputLabel='Name'
+        buttonLabel='Create'
         onConfirm={async label => {
           closeModal();
           await db.execute(
@@ -101,20 +106,59 @@ export const ItemsList: FC<Props> = props => {
     );
   };
 
-  const mapComponents = (items: Item[]) => {
-    const components: JSX.Element[] = [];
+  const handleDeleteItem = (id: number) => {
+    const item = items?.find(i => i.id === id);
+    if (!item) return;
 
-    for (const item of items) {
-      components.push(
-        <div key={item.id}>
-          <p>{item.label}</p>
-          {item.children.length > 0 ? mapComponents(item.children) : null}
-        </div>
-      );
-    }
-
-    return components;
+    openModal(
+      <RetypConfirmModal
+        title='Removing item, all linked items will also be deleted!'
+        confirmValue={item.label}
+        onConfirm={async () => {
+          closeModal();
+          await db.execute('DELETE FROM items WHERE id = $1', [id]);
+          notifications.add({
+            title: 'Item Deleted',
+            message: `"${item.label}" was successfully deleted`,
+            autoClose: 3000,
+          });
+          refresh();
+        }}
+      />
+    );
   };
+
+  // extracted for recursions
+  const mapFunc = (item: Item) => (
+    <div key={item.id} className={styles.children}>
+      <Box
+        onClick={() => {
+          props.setSelected(item.id);
+        }}
+        selected={props.selected === item.id}
+        className={styles.tree_item}
+      >
+        {item.label}
+        <div className={styles.button_group}>
+          <IconButton
+            size='1.1rem'
+            icon={IconPlus}
+            onClick={() => {
+              handleCreateItem(item.id);
+            }}
+          />
+          <IconButton
+            size='1.1rem'
+            icon={IconTrash}
+            onClick={() => {
+              handleDeleteItem(item.id);
+            }}
+          />
+        </div>
+      </Box>
+      {item.children.length > 0 && item.children.map(mapFunc)}
+    </div>
+  );
 
   return (
     <Sidebar
@@ -131,7 +175,7 @@ export const ItemsList: FC<Props> = props => {
           <Text size='sm'>No items found</Text>
         </span>
       ) : (
-        <div className={styles.tree}>{mapComponents(groupItems(items))}</div>
+        <div className={styles.tree}>{groupItems(items).map(mapFunc)}</div>
       )}
     </Sidebar>
   );
