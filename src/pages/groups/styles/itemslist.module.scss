@@ -1,16 +1,3 @@
-.groups_list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--mantine-spacing-xs);
-
-  // this checks the loader
-  &:has(span) {
-    overflow: hidden;
-  }
-}
-
 .items_list {
   display: flex;
   align-items: flex-start;

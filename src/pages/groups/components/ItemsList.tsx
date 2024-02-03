@@ -5,20 +5,14 @@ import { notifications } from '@/components/notifications';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
+import type { Queries } from '@/queries';
 import { useMainStore } from '@/stores/useMainStore';
-import type { Database } from '@/types/db';
 import { Loader, Text } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import type { FC } from 'react';
-import styles from '../groups.module.scss';
+import { type FC } from 'react';
+import { useGroupsPageStore } from '../stores/useGroupsPage';
 
-type Props = {
-  groupId: number;
-  selected: number | null;
-  setSelected: (id: number | null) => void;
-};
-
-type QueryResult = Omit<Database.ItemsTable, 'groupId'>[];
+import styles from '../styles/itemslist.module.scss';
 
 type Item = {
   id: number;
@@ -39,7 +33,7 @@ const findItemById = (items: Item[], id: number): Item | undefined => {
   }
 };
 
-const groupItems = (items: QueryResult) => {
+const groupItems = (items: Queries['getItemsByGroupId']) => {
   const itemsLeft = [...items];
   const groupped: Item[] = [];
 
@@ -75,13 +69,13 @@ const groupItems = (items: QueryResult) => {
   return groupped;
 };
 
-export const ItemsList: FC<Props> = props => {
+export const ItemsList: FC = () => {
+  const { selectedGroup, selectedItem, setSelectedItem } = useGroupsPageStore();
   const { openModal, closeModal } = useMainStore();
 
-  const { data: items, refresh } = useDatabase<QueryResult>(
-    'SELECT id, parentId, label FROM items WHERE groupId = $1',
-    [props.groupId]
-  );
+  const { data: items, refresh } = useDatabase('getItemsByGroupId', [
+    selectedGroup,
+  ]);
 
   const handleCreateItem = (parentId: number | null = null) => {
     openModal(
@@ -93,7 +87,7 @@ export const ItemsList: FC<Props> = props => {
           closeModal();
           await db.execute(
             'INSERT INTO items (groupId, parentId, label) VALUES ($1, $2, $3)',
-            [props.groupId, parentId, label]
+            [selectedGroup, parentId, label]
           );
           notifications.add({
             title: 'Item Created',
@@ -130,12 +124,12 @@ export const ItemsList: FC<Props> = props => {
 
   // extracted for recursions
   const mapFunc = (item: Item) => (
-    <div key={item.id} className={styles.children}>
+    <div key={`tree_item_${item.id}`} className={styles.children}>
       <Box
         onClick={() => {
-          props.setSelected(item.id);
+          setSelectedItem(item.id);
         }}
-        selected={props.selected === item.id}
+        selected={selectedItem === item.id}
         className={styles.tree_item}
       >
         {item.label}

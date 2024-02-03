@@ -7,21 +7,16 @@ import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
 import { useMainStore } from '@/stores/useMainStore';
-import type { Database } from '@/types/db';
 import { Loader, Text } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import type { FC } from 'react';
-import styles from '../groups.module.scss';
+import { useGroupsPageStore } from '../stores/useGroupsPage';
 
-type Props = {
-  selected: number | null;
-  setSelected: (id: number | null) => void;
-};
+import styles from '../styles/groupslist.module.scss';
 
-export const GroupsList: FC<Props> = props => {
-  const { data: groups, refresh } = useDatabase<Database.GroupsTable[]>(
-    'SELECT * FROM groups'
-  );
+export const GroupsList: FC = () => {
+  const { selectedGroup, setSelectedGroup } = useGroupsPageStore();
+  const { data: groups, refresh } = useDatabase('getGroups');
   const { openModal, closeModal } = useMainStore();
 
   const handleRemoveGroup = (id: number) => {
@@ -42,8 +37,8 @@ export const GroupsList: FC<Props> = props => {
           });
           refresh();
 
-          if (props.selected === id) {
-            props.setSelected(null);
+          if (selectedGroup === id) {
+            setSelectedGroup(null);
           }
         }}
       />
@@ -89,9 +84,9 @@ export const GroupsList: FC<Props> = props => {
           <Box
             key={`group-${group.id}`}
             onClick={() => {
-              props.setSelected(group.id);
+              setSelectedGroup(group.id);
             }}
-            selected={props.selected === group.id}
+            selected={selectedGroup === group.id}
           >
             <Text size='md'>{group.label}</Text>
             <IconButton

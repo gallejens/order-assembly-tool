@@ -1,23 +1,20 @@
 import { db } from '@/lib/db';
+import { QUERIES, type Queries } from '@/queries';
 import { useEffect, useRef, useState } from 'react';
-import Database from 'tauri-plugin-sql-api';
 
-type DatabaseSelectType = Parameters<InstanceType<typeof Database>['select']>;
-
-const ARTIFICIAL_DELAY = 0;
-
-export const useDatabase = <T>(
-  ...[query, values = []]: DatabaseSelectType
+export const useDatabase = <T extends keyof Queries>(
+  queryName: T,
+  values: unknown[] = []
 ): {
   refresh: () => Promise<void>;
-  data: T | null;
+  data: Queries[T] | null;
 } => {
-  const [data, setData] = useState<T | null>(null);
+  const [data, setData] = useState<Queries[T] | null>(null);
   const promiseResolveRej = useRef<(() => void) | null>(null);
 
   const executeQuery = async () => {
-    const promise = new Promise<T | null>((res, rej) => {
-      let timeout: number | null = null;
+    const promise = new Promise<Queries[T]>((res, rej) => {
+      const timeout: number | null = null;
 
       promiseResolveRej.current = () => {
         if (timeout !== null) {
@@ -26,10 +23,8 @@ export const useDatabase = <T>(
         rej('Cancelled');
       };
 
-      db.select<T>(query, values).then(result => {
-        timeout = setTimeout(() => {
-          res(result);
-        }, ARTIFICIAL_DELAY);
+      db.select<Queries[T]>(QUERIES[queryName], values).then(result => {
+        res(result);
       });
     });
 

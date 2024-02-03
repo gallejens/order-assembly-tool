@@ -1,32 +1,29 @@
 import { Text } from '@mantine/core';
-import { type FC, useState } from 'react';
+import { type FC } from 'react';
 import { GroupsList } from './components/GroupsList';
+import { Item } from './components/Item';
 import { ItemsList } from './components/ItemsList';
+import { useGroupsPageStore } from './stores/useGroupsPage';
 
 export const GroupsPage: FC = () => {
-  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
-  const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const { selectedGroup, selectedItem } = useGroupsPageStore();
 
   return (
     <>
-      <GroupsList selected={selectedGroup} setSelected={setSelectedGroup} />
+      <GroupsList />
       {selectedGroup === null ? (
         <div className='fullcenter'>
           <Text size='lg'>Select a group to continue</Text>
         </div>
       ) : (
         <>
-          <ItemsList
-            groupId={selectedGroup}
-            selected={selectedItem}
-            setSelected={setSelectedItem}
-          />
+          <ItemsList />
           {selectedItem === null ? (
             <div className='fullcenter'>
               <Text size='lg'>Select an item to continue</Text>
             </div>
           ) : (
-            <div>{selectedItem}</div>
+            <Item />
           )}
         </>
       )}
