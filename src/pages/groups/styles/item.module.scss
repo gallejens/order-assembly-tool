@@ -1,3 +1,11 @@
 .item {
   width: 100%;
+  padding: var(--mantine-spacing-xs);
+
+  & .tab_button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mantine-spacing-xs);
+  }
 }

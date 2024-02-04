@@ -6,21 +6,11 @@
   align-items: center;
   justify-content: flex-start;
   padding: var(--mantine-spacing-xs);
+  gap: var(--mantine-spacing-xs);
 
   // stop resize when inside flexbox
   flex-grow: 0;
   flex-shrink: 0;
-
-  & > .header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding-bottom: var(--mantine-spacing-xs);
-    border-bottom: 1px solid var(--mantine-color-default-border);
-    margin-bottom: var(--mantine-spacing-xs);
-  }
 
   & > .content {
     width: 100%;

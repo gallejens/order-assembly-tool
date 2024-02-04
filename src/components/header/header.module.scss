@@ -1,0 +1,10 @@
+.header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: var(--mantine-spacing-xs);
+  border-bottom: 2px solid var(--mantine-color-default-border);
+}

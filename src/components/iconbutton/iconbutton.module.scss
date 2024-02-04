@@ -1,3 +1,5 @@
+@use '../../styles/mixins' as *;
+
 .icon_button {
   aspect-ratio: 1;
   min-height: 0;
@@ -10,6 +12,7 @@
   color: light-dark(var(--mantine-color-dark-6), var(--mantine-color-gray-1));
 
   &:hover {
+    @include shadow;
     background-color: light-dark(
       var(--mantine-color-gray-3),
       var(--mantine-color-dark-5)

@@ -8,7 +8,7 @@ export type Queries = {
     parentId: number | null;
     label: string;
   }[];
-  getItemLabelById: { label: string }[];
+  getItemLabelById: [{ label: string }];
   getItemKeysByItemId: { id: number; name: string }[];
 };
 

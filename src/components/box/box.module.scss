@@ -1,4 +1,8 @@
+@use '../../styles/mixins' as *;
+
 .box {
+  @include shadow;
+
   width: 100%;
 
   display: flex;
