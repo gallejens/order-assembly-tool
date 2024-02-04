@@ -8,7 +8,9 @@ import styles from './iconbutton.module.scss';
 type Props = {
   tooltip?: {
     label: string;
-    position: TooltipProps['position'];
+    position?: TooltipProps['position'];
+    openDelay?: number;
+    closeDelay?: number;
   };
   onClick: () => void;
   active?: boolean;
@@ -41,6 +43,8 @@ export const IconButton: FC<Props> = props => {
       transitionProps={{ transition: 'pop' }}
       withArrow
       arrowSize={6}
+      openDelay={props.tooltip.openDelay}
+      closeDelay={props.tooltip.closeDelay}
     >
       {buttonElement}
     </Tooltip>

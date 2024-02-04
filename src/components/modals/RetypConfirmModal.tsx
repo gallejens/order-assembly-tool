@@ -1,10 +1,11 @@
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, Divider, Group, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FC } from 'react';
 import { Modal } from '.';
 
 type Props = {
   title: string;
+  text?: string;
   confirmValue: string;
   onConfirm: () => void;
   onCancel?: () => void;
@@ -36,6 +37,12 @@ export const RetypConfirmModal: FC<Props> = props => {
         onSubmit={form.onSubmit(handleConfirm)}
         style={{ userSelect: 'none' }}
       >
+        {props.text && (
+          <>
+            <Text size='sm'>{props.text}</Text>
+            <Divider my='xs' />
+          </>
+        )}
         <TextInput
           label={`To confirm, type "${props.confirmValue}" in the box below`}
           {...form.getInputProps('confirm')}

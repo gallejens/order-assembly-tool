@@ -1,5 +1,9 @@
 import type { FC } from 'react';
 
-export const ItemProducts: FC = () => {
+type Props = {
+  itemId: number;
+};
+
+export const ItemProducts: FC<Props> = props => {
   return <div>Products</div>;
 };

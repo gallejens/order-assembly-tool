@@ -1,4 +1,4 @@
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, Divider, Group, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FC } from 'react';
 import { Modal } from '.';
@@ -9,6 +9,7 @@ type FormValues = {
 
 type Props = {
   title: string;
+  text?: string;
   inputLabel: string;
   buttonLabel: string;
   onConfirm: (label: string) => void;
@@ -31,6 +32,12 @@ export const TextInputModal: FC<Props> = props => {
           props.onConfirm(value);
         })}
       >
+        {props.text && (
+          <>
+            <Text size='sm'>{props.text}</Text>
+            <Divider my='xs' />
+          </>
+        )}
         <TextInput
           withAsterisk
           label={props.inputLabel}

@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 import type { Queries } from '@/queries';
 import { useMainStore } from '@/stores/useMainStore';
 import { Loader, Text } from '@mantine/core';
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconForms, IconPlus, IconTrash } from '@tabler/icons-react';
 import { type FC } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
 
@@ -78,9 +78,18 @@ export const ItemsList: FC = () => {
   ]);
 
   const handleCreateItem = (parentId: number | null = null) => {
+    const parentItemLabel =
+      (parentId === null ? undefined : items?.find(i => i.id === parentId))
+        ?.label ?? 'Unknown';
+
     openModal(
       <TextInputModal
         title='Create a new item'
+        text={
+          parentId === null
+            ? undefined
+            : `This item will be a subitem to "${parentItemLabel}"`
+        }
         inputLabel='Name'
         buttonLabel='Create'
         onConfirm={async label => {
@@ -106,7 +115,8 @@ export const ItemsList: FC = () => {
 
     openModal(
       <RetypConfirmModal
-        title='Removing item, all linked items will also be deleted!'
+        title={`Deleting ${item.label}`}
+        text='Caution: all depending items will also be deleted!'
         confirmValue={item.label}
         onConfirm={async () => {
           closeModal();
@@ -122,11 +132,38 @@ export const ItemsList: FC = () => {
     );
   };
 
+  const handleRenameItem = (id: number) => {
+    const item = items?.find(g => g.id === id);
+    if (!item) return;
+
+    openModal(
+      <TextInputModal
+        title={`Renaming ${item.label}`}
+        inputLabel='New Name'
+        buttonLabel='Rename'
+        onConfirm={async label => {
+          closeModal();
+          await db.execute('UPDATE items SET label = $1 WHERE id = $2', [
+            label,
+            id,
+          ]);
+          notifications.add({
+            title: 'Item Renamed',
+            message: `"${item.label}" was successfully renamed to "${label}"`,
+            autoClose: 3000,
+          });
+          refresh();
+        }}
+      />
+    );
+  };
+
   // extracted for recursions
   const mapFunc = (item: Item) => (
     <div key={`tree_item_${item.id}`} className={styles.children}>
       <Box
         onClick={() => {
+          if (item.id === selectedItem) return;
           setSelectedItem(item.id);
         }}
         selected={selectedItem === item.id}
@@ -140,12 +177,31 @@ export const ItemsList: FC = () => {
             onClick={() => {
               handleCreateItem(item.id);
             }}
+            tooltip={{
+              label: 'Add',
+              openDelay: 300,
+            }}
+          />
+          <IconButton
+            size='1.1rem'
+            icon={IconForms}
+            onClick={() => {
+              handleRenameItem(item.id);
+            }}
+            tooltip={{
+              label: 'Rename',
+              openDelay: 300,
+            }}
           />
           <IconButton
             size='1.1rem'
             icon={IconTrash}
             onClick={() => {
               handleDeleteItem(item.id);
+            }}
+            tooltip={{
+              label: 'Delete',
+              openDelay: 300,
             }}
           />
         </div>

@@ -9,4 +9,11 @@
   &:has(span) {
     overflow: hidden;
   }
+
+  & .button_group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mantine-spacing-xs);
+  }
 }

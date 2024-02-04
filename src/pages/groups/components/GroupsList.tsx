@@ -8,7 +8,7 @@ import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
 import { useMainStore } from '@/stores/useMainStore';
 import { Loader, Text } from '@mantine/core';
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconForms, IconPlus, IconTrash } from '@tabler/icons-react';
 import type { FC } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
 
@@ -19,13 +19,14 @@ export const GroupsList: FC = () => {
   const { data: groups, refresh } = useDatabase('getGroups');
   const { openModal, closeModal } = useMainStore();
 
-  const handleRemoveGroup = (id: number) => {
+  const handleDeleteGroup = (id: number) => {
     const group = groups?.find(g => g.id === id);
     if (!group) return;
 
     openModal(
       <RetypConfirmModal
-        title='Removing group, all items in this group will also be deleted!'
+        title={`Renaming ${group.label}`}
+        text={'Caution: all items in this group will also be deleted!'}
         confirmValue={group.label}
         onConfirm={async () => {
           closeModal();
@@ -65,6 +66,32 @@ export const GroupsList: FC = () => {
     );
   };
 
+  const handleRenameGroup = (id: number) => {
+    const group = groups?.find(g => g.id === id);
+    if (!group) return;
+
+    openModal(
+      <TextInputModal
+        title={`Renaming ${group.label}`}
+        inputLabel='New Name'
+        buttonLabel='Rename'
+        onConfirm={async label => {
+          closeModal();
+          await db.execute('UPDATE groups SET label = $1 WHERE id = $2', [
+            label,
+            id,
+          ]);
+          notifications.add({
+            title: 'Group Renamed',
+            message: `"${group.label}" was successfully renamed to "${label}"`,
+            autoClose: 3000,
+          });
+          refresh();
+        }}
+      />
+    );
+  };
+
   return (
     <Sidebar
       title='Groups'
@@ -84,18 +111,36 @@ export const GroupsList: FC = () => {
           <Box
             key={`group-${group.id}`}
             onClick={() => {
+              if (group.id === selectedGroup) return;
               setSelectedGroup(group.id);
             }}
             selected={selectedGroup === group.id}
           >
             <Text size='md'>{group.label}</Text>
-            <IconButton
-              onClick={() => {
-                handleRemoveGroup(group.id);
-              }}
-              icon={IconTrash}
-              size='1.1rem'
-            />
+            <div className={styles.button_group}>
+              <IconButton
+                onClick={() => {
+                  handleRenameGroup(group.id);
+                }}
+                icon={IconForms}
+                size='1.1rem'
+                tooltip={{
+                  label: 'Rename',
+                  openDelay: 300,
+                }}
+              />
+              <IconButton
+                onClick={() => {
+                  handleDeleteGroup(group.id);
+                }}
+                icon={IconTrash}
+                size='1.1rem'
+                tooltip={{
+                  label: 'Delete',
+                  openDelay: 300,
+                }}
+              />
+            </div>
           </Box>
         ))
       )}

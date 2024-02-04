@@ -1,7 +1,7 @@
 import { useDatabase } from '@/hooks/useDatabase';
-import { SegmentedControl } from '@mantine/core';
+import { Loader, SegmentedControl, Text } from '@mantine/core';
 import { IconBox, IconFilter, IconSitemap } from '@tabler/icons-react';
-import { type ComponentType, type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
 import { ItemFilters } from './ItemFilters';
 import { ItemProducts } from './ItemProducts';
@@ -10,74 +10,69 @@ import { ItemProperties } from './ItemProperties';
 import { Header } from '@/components/header';
 import styles from '../styles/item.module.scss';
 
-const TABS: Record<
-  string,
+const TABS = [
   {
-    label: JSX.Element;
-    component: ComponentType;
-  }
-> = {
-  properties: {
+    value: 'properties',
     label: (
       <div className={styles.tab_button}>
-        <IconSitemap />
-        <span>Properties</span>
+        <IconSitemap size='1rem' />
+        <Text size='xs'>Properties</Text>
       </div>
     ),
     component: ItemProperties,
   },
-  filters: {
+  {
+    value: 'filters',
     label: (
       <div className={styles.tab_button}>
-        <IconFilter />
-        <span>Filters</span>
+        <IconFilter size='1rem' />
+        <Text size='xs'>Filters</Text>
       </div>
     ),
     component: ItemFilters,
   },
-  products: {
+  {
+    value: 'products',
     label: (
       <div className={styles.tab_button}>
-        <IconBox />
-        <span>Products</span>
+        <IconBox size='1rem' />
+        <Text size='xs'>Products</Text>
       </div>
     ),
     component: ItemProducts,
   },
-};
+];
 
 export const Item: FC = () => {
   const { selectedItem: itemId } = useGroupsPageStore();
-  const [tab, setTab] = useState(Object.keys(TABS)[0]);
-
+  const [tab, setTab] = useState(TABS[0].value);
   const { data: itemDataResult } = useDatabase('getItemLabelById', [itemId]);
-  const { data: itemKeys } = useDatabase('getItemKeysByItemId', [itemId]);
 
-  const loading = itemDataResult === null || itemKeys === null;
+  const selectedTab = TABS.find(({ value }) => value === tab);
 
-  if (loading) return <div>Loading...</div>;
-
-  const itemLabel = itemDataResult[0].label;
-  const selectedTab = TABS[tab];
+  if (itemId === null) {
+    throw new Error('Item ID is not provided');
+  }
 
   return (
     <div className={styles.item}>
       <Header
-        title={itemLabel}
+        title={itemDataResult?.[0].label ?? 'Loading'}
         rightSide={
           <SegmentedControl
             value={tab}
             onChange={setTab}
-            data={Object.entries(TABS).map(([key, { label }]) => ({
-              value: key,
-              label,
-            }))}
+            data={TABS}
             size='xs'
             color='primary'
           />
         }
       />
-      <selectedTab.component />
+      {selectedTab === undefined ? (
+        <Loader />
+      ) : (
+        <selectedTab.component itemId={itemId} />
+      )}
     </div>
   );
 };
