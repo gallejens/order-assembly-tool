@@ -1,12 +1,142 @@
+import { Box } from '@/components/box';
+import { RetypConfirmModal, TextInputModal } from '@/components/modals';
+import { notifications } from '@/components/notifications';
 import { useDatabase } from '@/hooks/useDatabase';
+import { db } from '@/lib/db';
+import { useMainStore } from '@/stores/useMainStore';
+import { Button, Chip, Loader, Text } from '@mantine/core';
 import type { FC } from 'react';
+
+import { IconButton } from '@/components/iconbutton';
+import { Resizeable } from '@/components/resizeable';
+import { IconTrash } from '@tabler/icons-react';
+import styles from '../styles/itemproperties.module.scss';
 
 type Props = {
   itemId: number;
+  itemLabel: string;
+};
+
+const SUGGESTED_PROPERTIES = ['Productnumber'];
+
+const addKey = async (itemId: number, itemLabel: string, keyName: string) => {
+  await db.execute('INSERT INTO item_keys (itemId, name) VALUES ($1, $2);', [
+    itemId,
+    keyName,
+  ]);
+  notifications.add({
+    title: 'Property Added',
+    message: `Property "${keyName}" was successfully added to "${itemLabel}"`,
+    autoClose: 3000,
+  });
 };
 
 export const ItemProperties: FC<Props> = props => {
-  const { data: itemKeys } = useDatabase('getItemKeysByItemId', [props.itemId]);
+  const { data: itemKeys, refresh } = useDatabase('getItemKeysByItemId', [
+    props.itemId,
+  ]);
+  const { openModal, closeModal } = useMainStore();
 
-  return <div>{JSON.stringify(itemKeys)}</div>;
+  if (itemKeys === null) {
+    return (
+      <div className='fullcenter'>
+        <Loader />
+      </div>
+    );
+  }
+
+  const handleAddKey = () => {
+    openModal(
+      <TextInputModal
+        title={`Add property to "${props.itemLabel}"`}
+        inputLabel='Property Name'
+        buttonLabel='Add'
+        onConfirm={async keyName => {
+          closeModal();
+          addKey(props.itemId, props.itemLabel, keyName);
+          refresh();
+        }}
+      />
+    );
+  };
+
+  const handleDeleteKey = (id: number) => {
+    const key = itemKeys.find(k => k.id === id);
+    if (!key) return;
+
+    openModal(
+      <RetypConfirmModal
+        title={`Delete property "${key.name}"`}
+        confirmValue={key.name}
+        onConfirm={async () => {
+          closeModal();
+          await db.execute('DELETE FROM item_keys WHERE id = $1', [id]);
+          notifications.add({
+            title: 'Property Deleted',
+            message: `Property "${key.name}" was successfully deleted`,
+            autoClose: 3000,
+          });
+          refresh();
+        }}
+      />
+    );
+  };
+
+  const handleAddSuggestedKey = async (keyName: string) => {
+    await addKey(props.itemId, props.itemLabel, keyName);
+    refresh();
+  };
+
+  const suggestedKeys = SUGGESTED_PROPERTIES.reduce<string[]>((acc, cur) => {
+    if (itemKeys.find(k => k.name === cur)) return acc;
+    acc.push(cur);
+    return acc;
+  }, []);
+
+  return (
+    <div className={styles.item_properties}>
+      <div className={styles.keys}>
+        {itemKeys.map(key => (
+          <Box key={`item_key_${key.id}`}>
+            <Text>{key.name}</Text>
+            <IconButton
+              icon={IconTrash}
+              size='1.1rem'
+              onClick={() => {
+                handleDeleteKey(key.id);
+              }}
+              tooltip={{
+                label: 'Delete',
+                openDelay: 300,
+              }}
+            />
+          </Box>
+        ))}
+      </div>
+      <Resizeable
+        direction={{ left: true }}
+        className={styles.inputs}
+        initialWidth='250px'
+        minWidth='200px'
+        maxWidth='300px'
+        storageKey={'item_properties_inputs'}
+      >
+        <Button onClick={handleAddKey}>Add Custom</Button>
+        {suggestedKeys.length > 0 && (
+          <Text truncate='end' c='dimmed'>
+            Suggested:
+          </Text>
+        )}
+        {suggestedKeys.map(key => (
+          <Chip
+            onClick={() => {
+              handleAddSuggestedKey(key);
+            }}
+          >
+            {key}
+          </Chip>
+        ))}
+      </Resizeable>
+    </div>
+  );
 };

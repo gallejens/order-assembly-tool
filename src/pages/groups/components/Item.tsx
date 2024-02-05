@@ -54,12 +54,15 @@ export const Item: FC = () => {
     throw new Error('Item ID is not provided');
   }
 
+  const itemLabel = itemDataResult?.[0]?.label ?? 'Loading';
+
   return (
     <div className={styles.item}>
       <Header
-        title={itemDataResult?.[0].label ?? 'Loading'}
+        title={itemLabel}
         rightSide={
           <SegmentedControl
+            className='shadow'
             value={tab}
             onChange={setTab}
             data={TABS}
@@ -71,7 +74,7 @@ export const Item: FC = () => {
       {selectedTab === undefined ? (
         <Loader />
       ) : (
-        <selectedTab.component itemId={itemId} />
+        <selectedTab.component itemId={itemId} itemLabel={itemLabel} />
       )}
     </div>
   );

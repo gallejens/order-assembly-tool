@@ -3,7 +3,7 @@ import { type FC, type PropsWithChildren, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './resizeable.module.scss';
 
-type Direction = 'right' | 'bottom';
+type Direction = 'left' | 'right' | 'bottom';
 
 type Props = {
   initialWidth?: string;
@@ -18,15 +18,23 @@ type Props = {
 };
 
 const DIRECTION_INFO = {
+  left: {
+    eventKey: 'clientX',
+    rectKey: 'right',
+    styleKey: 'width',
+    multiplier: -1,
+  },
   right: {
     eventKey: 'clientX',
     rectKey: 'left',
     styleKey: 'width',
+    multiplier: 1,
   },
   bottom: {
     eventKey: 'clientY',
     rectKey: 'top',
     styleKey: 'height',
+    multiplier: 1,
   },
 } as const;
 
@@ -78,7 +86,9 @@ export const Resizeable: FC<PropsWithChildren<Props>> = props => {
       const directionInfo = DIRECTION_INFO[dirRef.current];
       const containerRect = containerRef.current.getBoundingClientRect();
       const movement = e[directionInfo.eventKey];
-      const newCoord = movement - containerRect[directionInfo.rectKey];
+      const newCoord =
+        (movement - containerRect[directionInfo.rectKey]) *
+        directionInfo.multiplier;
 
       containerRef.current.style[directionInfo.styleKey] = `${newCoord}px`;
     };

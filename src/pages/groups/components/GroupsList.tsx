@@ -25,8 +25,8 @@ export const GroupsList: FC = () => {
 
     openModal(
       <RetypConfirmModal
-        title={`Renaming ${group.label}`}
-        text={'Caution: all items in this group will also be deleted!'}
+        title={`Delete group "${group.label}"`}
+        text={'Caution: all items in this group will be deleted!'}
         confirmValue={group.label}
         onConfirm={async () => {
           closeModal();
@@ -72,7 +72,7 @@ export const GroupsList: FC = () => {
 
     openModal(
       <TextInputModal
-        title={`Renaming ${group.label}`}
+        title={`Rename group "${group.label}"`}
         inputLabel='New Name'
         buttonLabel='Rename'
         onConfirm={async label => {

@@ -7,28 +7,47 @@ $border: 1px solid var(--mantine-color-default-border);
   position: absolute;
 }
 
+@mixin vertical {
+  @include resize_area;
+
+  width: $size;
+  cursor: ew-resize;
+}
+
+@mixin horizontal {
+  @include resize_area;
+
+  height: $size;
+  cursor: ns-resize;
+}
+
 .resizeable {
   position: relative;
 
-  & > .right {
-    @include resize_area;
+  flex-grow: 0;
+  flex-shrink: 0;
 
-    width: $size;
+  & > .left {
+    @include vertical;
+
+    top: 0;
+    left: 0;
+    border-left: $border;
+  }
+
+  & > .right {
+    @include vertical;
+
     top: 0;
     right: 0;
-    cursor: ew-resize;
-
     border-right: $border;
   }
 
   & > .bottom {
-    @include resize_area;
+    @include horizontal;
 
-    height: $size;
     left: 0;
     bottom: 0;
-    cursor: ns-resize;
-
     border-bottom: $border;
   }
 }

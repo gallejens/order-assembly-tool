@@ -1,6 +1,11 @@
 .item {
   width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   padding: var(--mantine-spacing-xs);
+  gap: var(--mantine-spacing-xs);
 
   & .tab_button {
     display: flex;

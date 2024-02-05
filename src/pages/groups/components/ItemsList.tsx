@@ -84,11 +84,10 @@ export const ItemsList: FC = () => {
 
     openModal(
       <TextInputModal
-        title='Create a new item'
-        text={
+        title={
           parentId === null
-            ? undefined
-            : `This item will be a subitem to "${parentItemLabel}"`
+            ? 'Create a new item'
+            : `Add subitem to "${parentItemLabel}"`
         }
         inputLabel='Name'
         buttonLabel='Create'
@@ -115,8 +114,8 @@ export const ItemsList: FC = () => {
 
     openModal(
       <RetypConfirmModal
-        title={`Deleting ${item.label}`}
-        text='Caution: all depending items will also be deleted!'
+        title={`Delete "${item.label}"`}
+        text='Caution: all subitems will also be deleted!'
         confirmValue={item.label}
         onConfirm={async () => {
           closeModal();
@@ -138,7 +137,7 @@ export const ItemsList: FC = () => {
 
     openModal(
       <TextInputModal
-        title={`Renaming ${item.label}`}
+        title={`Rename "${item.label}"`}
         inputLabel='New Name'
         buttonLabel='Rename'
         onConfirm={async label => {
@@ -169,7 +168,9 @@ export const ItemsList: FC = () => {
         selected={selectedItem === item.id}
         className={styles.tree_item}
       >
-        {item.label}
+        <Text size='md' truncate='end'>
+          {item.label}
+        </Text>
         <div className={styles.button_group}>
           <IconButton
             size='1.1rem'

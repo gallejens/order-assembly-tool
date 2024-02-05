@@ -5,7 +5,7 @@ import styles from './box.module.scss';
 
 type Props = {
   selected?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
 };
 

@@ -19,6 +19,9 @@
   border: 1px solid var(--mantine-color-default-border);
   border-radius: var(--mantine-radius-sm);
 
+  flex-grow: 0;
+  flex-shrink: 0;
+
   &:hover {
     background-color: light-dark(
       var(--mantine-color-gray-3),
