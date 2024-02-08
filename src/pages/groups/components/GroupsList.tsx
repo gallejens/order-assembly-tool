@@ -1,8 +1,7 @@
-import { Box } from '@/components/box';
-import { IconButton } from '@/components/iconbutton';
 import { RetypConfirmModal } from '@/components/modals/RetypConfirmModal';
 import { TextInputModal } from '@/components/modals/TextInputModal';
 import { notifications } from '@/components/notifications';
+import { OptionLabelBox } from '@/components/optionlabelbox';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
@@ -108,40 +107,31 @@ export const GroupsList: FC = () => {
         </span>
       ) : (
         groups.map(group => (
-          <Box
+          <OptionLabelBox
             key={`group-${group.id}`}
+            label={group.label}
             onClick={() => {
               if (group.id === selectedGroup) return;
               setSelectedGroup(group.id);
             }}
             selected={selectedGroup === group.id}
-          >
-            <Text size='md'>{group.label}</Text>
-            <div className={styles.button_group}>
-              <IconButton
-                onClick={() => {
+            options={[
+              {
+                label: 'Rename',
+                icon: IconForms,
+                onClick: () => {
                   handleRenameGroup(group.id);
-                }}
-                icon={IconForms}
-                size='1.1rem'
-                tooltip={{
-                  label: 'Rename',
-                  openDelay: 300,
-                }}
-              />
-              <IconButton
-                onClick={() => {
+                },
+              },
+              {
+                label: 'Delete',
+                icon: IconTrash,
+                onClick: () => {
                   handleDeleteGroup(group.id);
-                }}
-                icon={IconTrash}
-                size='1.1rem'
-                tooltip={{
-                  label: 'Delete',
-                  openDelay: 300,
-                }}
-              />
-            </div>
-          </Box>
+                },
+              },
+            ]}
+          />
         ))
       )}
     </Sidebar>

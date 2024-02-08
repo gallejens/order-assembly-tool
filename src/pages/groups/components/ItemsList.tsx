@@ -1,7 +1,6 @@
-import { Box } from '@/components/box';
-import { IconButton } from '@/components/iconbutton';
 import { RetypConfirmModal, TextInputModal } from '@/components/modals';
 import { notifications } from '@/components/notifications';
+import { OptionLabelBox } from '@/components/optionlabelbox';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
@@ -160,53 +159,38 @@ export const ItemsList: FC = () => {
   // extracted for recursions
   const mapFunc = (item: Item) => (
     <div key={`tree_item_${item.id}`} className={styles.children}>
-      <Box
+      <OptionLabelBox
         onClick={() => {
           if (item.id === selectedItem) return;
           setSelectedItem(item.id);
         }}
+        label={item.label}
         selected={selectedItem === item.id}
         className={styles.tree_item}
-      >
-        <Text size='md' truncate='end'>
-          {item.label}
-        </Text>
-        <div className={styles.button_group}>
-          <IconButton
-            size='1.1rem'
-            icon={IconPlus}
-            onClick={() => {
+        options={[
+          {
+            label: 'Add Subitem',
+            icon: IconPlus,
+            onClick: () => {
               handleCreateItem(item.id);
-            }}
-            tooltip={{
-              label: 'Add',
-              openDelay: 300,
-            }}
-          />
-          <IconButton
-            size='1.1rem'
-            icon={IconForms}
-            onClick={() => {
+            },
+          },
+          {
+            label: 'Rename',
+            icon: IconForms,
+            onClick: () => {
               handleRenameItem(item.id);
-            }}
-            tooltip={{
-              label: 'Rename',
-              openDelay: 300,
-            }}
-          />
-          <IconButton
-            size='1.1rem'
-            icon={IconTrash}
-            onClick={() => {
+            },
+          },
+          {
+            label: 'Delete',
+            icon: IconTrash,
+            onClick: () => {
               handleDeleteItem(item.id);
-            }}
-            tooltip={{
-              label: 'Delete',
-              openDelay: 300,
-            }}
-          />
-        </div>
-      </Box>
+            },
+          },
+        ]}
+      />
       {item.children.length > 0 && item.children.map(mapFunc)}
     </div>
   );

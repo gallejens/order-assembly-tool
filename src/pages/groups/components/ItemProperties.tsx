@@ -1,15 +1,13 @@
-import { Box } from '@/components/box';
 import { RetypConfirmModal, TextInputModal } from '@/components/modals';
 import { notifications } from '@/components/notifications';
+import { OptionLabelBox } from '@/components/optionlabelbox';
+import { Resizeable } from '@/components/resizeable';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
 import { useMainStore } from '@/stores/useMainStore';
-import { Button, Chip, Loader, Text } from '@mantine/core';
-import type { FC } from 'react';
-
-import { IconButton } from '@/components/iconbutton';
-import { Resizeable } from '@/components/resizeable';
+import { Button, Center, Chip, Loader, Text } from '@mantine/core';
 import { IconForms, IconTrash } from '@tabler/icons-react';
+import type { FC } from 'react';
 import styles from '../styles/itemproperties.module.scss';
 
 type Props = {
@@ -122,35 +120,34 @@ export const ItemProperties: FC<Props> = props => {
   return (
     <div className={styles.item_properties}>
       <div className={styles.keys}>
-        {itemKeys.map(key => (
-          <Box key={`item_key_${key.id}`}>
-            <Text>{key.name}</Text>
-            <div className={styles.button_group}>
-              <IconButton
-                onClick={() => {
-                  handleRenameGroup(key.id);
-                }}
-                icon={IconForms}
-                size='1.1rem'
-                tooltip={{
+        {itemKeys.length === 0 ? (
+          <Center>
+            <Text>No properties found</Text>
+          </Center>
+        ) : (
+          itemKeys.map(key => (
+            <OptionLabelBox
+              key={`item_key_${key.id}`}
+              label={key.name}
+              options={[
+                {
                   label: 'Rename',
-                  openDelay: 300,
-                }}
-              />
-              <IconButton
-                icon={IconTrash}
-                size='1.1rem'
-                onClick={() => {
-                  handleDeleteKey(key.id);
-                }}
-                tooltip={{
+                  icon: IconForms,
+                  onClick: () => {
+                    handleRenameGroup(key.id);
+                  },
+                },
+                {
                   label: 'Delete',
-                  openDelay: 300,
-                }}
-              />
-            </div>
-          </Box>
-        ))}
+                  icon: IconTrash,
+                  onClick: () => {
+                    handleDeleteKey(key.id);
+                  },
+                },
+              ]}
+            />
+          ))
+        )}
       </div>
       <Resizeable
         direction={{ left: true }}
