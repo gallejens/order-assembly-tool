@@ -9,7 +9,7 @@ import type { FC } from 'react';
 
 import { IconButton } from '@/components/iconbutton';
 import { Resizeable } from '@/components/resizeable';
-import { IconTrash } from '@tabler/icons-react';
+import { IconForms, IconTrash } from '@tabler/icons-react';
 import styles from '../styles/itemproperties.module.scss';
 
 type Props = {
@@ -82,6 +82,32 @@ export const ItemProperties: FC<Props> = props => {
     );
   };
 
+  const handleRenameGroup = (id: number) => {
+    const itemKey = itemKeys?.find(g => g.id === id);
+    if (!itemKey) return;
+
+    openModal(
+      <TextInputModal
+        title={`Rename property "${itemKey.name}"`}
+        inputLabel='New Name'
+        buttonLabel='Rename'
+        onConfirm={async name => {
+          closeModal();
+          await db.execute('UPDATE item_keys SET name = $1 WHERE id = $2', [
+            name,
+            id,
+          ]);
+          notifications.add({
+            title: 'Property Renamed',
+            message: `"${itemKey.name}" was successfully renamed to "${name}"`,
+            autoClose: 3000,
+          });
+          refresh();
+        }}
+      />
+    );
+  };
+
   const handleAddSuggestedKey = async (keyName: string) => {
     await addKey(props.itemId, props.itemLabel, keyName);
     refresh();
@@ -99,17 +125,30 @@ export const ItemProperties: FC<Props> = props => {
         {itemKeys.map(key => (
           <Box key={`item_key_${key.id}`}>
             <Text>{key.name}</Text>
-            <IconButton
-              icon={IconTrash}
-              size='1.1rem'
-              onClick={() => {
-                handleDeleteKey(key.id);
-              }}
-              tooltip={{
-                label: 'Delete',
-                openDelay: 300,
-              }}
-            />
+            <div className={styles.button_group}>
+              <IconButton
+                onClick={() => {
+                  handleRenameGroup(key.id);
+                }}
+                icon={IconForms}
+                size='1.1rem'
+                tooltip={{
+                  label: 'Rename',
+                  openDelay: 300,
+                }}
+              />
+              <IconButton
+                icon={IconTrash}
+                size='1.1rem'
+                onClick={() => {
+                  handleDeleteKey(key.id);
+                }}
+                tooltip={{
+                  label: 'Delete',
+                  openDelay: 300,
+                }}
+              />
+            </div>
           </Box>
         ))}
       </div>

@@ -4,6 +4,6 @@ type Props = {
   itemId: number;
 };
 
-export const ItemFilters: FC<Props> = props => {
+export const ItemFilters: FC<Props> = () => {
   return <div>Filters</div>;
 };
