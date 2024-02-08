@@ -45,7 +45,10 @@ export const OptionLabelBox: FC<Props> = props => {
             <Menu.Item
               key={`menu_option_${i}`}
               leftSection={<option.icon style={{ width: '1.3rem' }} />}
-              onClick={option.onClick}
+              onClick={e => {
+                e.stopPropagation();
+                option.onClick();
+              }}
             >
               {option.label}
             </Menu.Item>

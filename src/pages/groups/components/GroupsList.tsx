@@ -7,7 +7,13 @@ import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
 import { useMainStore } from '@/stores/useMainStore';
 import { Loader, Text } from '@mantine/core';
-import { IconForms, IconPlus, IconTrash } from '@tabler/icons-react';
+import {
+  IconArrowBadgeDown,
+  IconArrowBadgeUp,
+  IconForms,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons-react';
 import type { FC } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
 
@@ -46,6 +52,8 @@ export const GroupsList: FC = () => {
   };
 
   const handleCreateGroup = () => {
+    if (!groups) return;
+
     openModal(
       <TextInputModal
         title='Create a new group'
@@ -53,7 +61,10 @@ export const GroupsList: FC = () => {
         buttonLabel='Create'
         onConfirm={async label => {
           closeModal();
-          await db.execute('INSERT INTO groups (label) VALUES ($1)', [label]);
+          await db.execute(
+            'INSERT INTO groups (label, position) VALUES ($1, $2);',
+            [label, groups[groups.length - 1].position + 1]
+          );
           notifications.add({
             title: 'Group Created',
             message: `"${label}" was successfully created`,
@@ -91,6 +102,25 @@ export const GroupsList: FC = () => {
     );
   };
 
+  const handleGroupPositionChange = async (id: number, movement: 1 | -1) => {
+    if (!groups) return;
+
+    const idx = groups.findIndex(g => g.id === id);
+    const swappingIdx = idx + movement;
+
+    await db.execute(
+      'UPDATE groups SET position = CASE id WHEN $1 THEN $2 WHEN $3 then $4 END WHERE ID in ($1, $3);',
+      [
+        id,
+        groups[swappingIdx].position,
+        groups[swappingIdx].id,
+        groups[idx].position,
+      ]
+    );
+
+    refresh();
+  };
+
   return (
     <Sidebar
       title='Groups'
@@ -106,33 +136,57 @@ export const GroupsList: FC = () => {
           <Text size='sm'>Create a group to get started</Text>
         </span>
       ) : (
-        groups.map(group => (
-          <OptionLabelBox
-            key={`group-${group.id}`}
-            label={group.label}
-            onClick={() => {
-              if (group.id === selectedGroup) return;
-              setSelectedGroup(group.id);
-            }}
-            selected={selectedGroup === group.id}
-            options={[
-              {
-                label: 'Rename',
-                icon: IconForms,
-                onClick: () => {
-                  handleRenameGroup(group.id);
-                },
+        groups.map((group, idx) => {
+          const options = [
+            {
+              label: 'Rename',
+              icon: IconForms,
+              onClick: () => {
+                handleRenameGroup(group.id);
               },
-              {
-                label: 'Delete',
-                icon: IconTrash,
-                onClick: () => {
-                  handleDeleteGroup(group.id);
-                },
+            },
+            {
+              label: 'Delete',
+              icon: IconTrash,
+              onClick: () => {
+                handleDeleteGroup(group.id);
               },
-            ]}
-          />
-        ))
+            },
+          ];
+
+          if (idx !== 0) {
+            options.push({
+              label: 'Move Up',
+              icon: IconArrowBadgeUp,
+              onClick: () => {
+                handleGroupPositionChange(group.id, -1);
+              },
+            });
+          }
+
+          if (idx !== groups.length - 1) {
+            options.push({
+              label: 'Move Down',
+              icon: IconArrowBadgeDown,
+              onClick: () => {
+                handleGroupPositionChange(group.id, 1);
+              },
+            });
+          }
+
+          return (
+            <OptionLabelBox
+              key={`group-${group.id}`}
+              label={group.label}
+              onClick={() => {
+                if (group.id === selectedGroup) return;
+                setSelectedGroup(group.id);
+              }}
+              selected={selectedGroup === group.id}
+              options={options}
+            />
+          );
+        })
       )}
     </Sidebar>
   );

@@ -165,6 +165,7 @@ export const ItemProperties: FC<Props> = props => {
         )}
         {suggestedKeys.map(key => (
           <Chip
+            key={`suggested_key_${key}`}
             onClick={() => {
               handleAddSuggestedKey(key);
             }}
