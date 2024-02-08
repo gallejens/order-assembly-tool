@@ -10,13 +10,23 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+fn get_migrations() -> Vec<Migration> {
+    let mut migrations: Vec<Migration> = Vec::new();
+
+    for (i, mig) in migrations::MIGRATIONS.into_iter().enumerate() {
+        migrations.push(Migration {
+            version: i as i64 + 1,
+            description: mig.description,
+            sql: mig.sql,
+            kind: MigrationKind::Up,
+        });
+    }
+
+    return migrations;
+}
+
 fn main() {
-    let migrations = vec![Migration {
-        version: 1,
-        description: "create_initial_tables",
-        sql: migrations::MIGRATIONS,
-        kind: MigrationKind::Up,
-    }];
+    let migrations = get_migrations();
 
     let builder = tauri::Builder::default();
 
