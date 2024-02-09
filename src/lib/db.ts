@@ -1,3 +1,4 @@
+import { QUERIES, type Queries } from '@/queries';
 import Database from 'tauri-plugin-sql-api';
 
 export let db: Database;
@@ -15,4 +16,11 @@ const getDb = async () => {
 (async () => {
   db = await getDb();
 })();
+
+export const executeSelectQuery = <T extends keyof Queries>(
+  queryName: T,
+  values: unknown[] = []
+): Promise<Queries[T]> => {
+  return db.select<Queries[T]>(QUERIES[queryName], values);
+};
 

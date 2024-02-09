@@ -8,14 +8,13 @@ import { useMainStore } from '@/stores/useMainStore';
 import { Button, Center, Chip, Loader, Text } from '@mantine/core';
 import { IconForms, IconTrash } from '@tabler/icons-react';
 import type { FC } from 'react';
+import { useGroupsPageStore } from '../stores/useGroupsPage';
 import styles from '../styles/itemproperties.module.scss';
 
 type Props = {
   itemId: number;
   itemLabel: string;
 };
-
-const SUGGESTED_PROPERTIES = ['Productnumber'];
 
 const addKey = async (itemId: number, itemLabel: string, keyName: string) => {
   await db.execute('INSERT INTO item_keys (itemId, name) VALUES ($1, $2);', [
@@ -30,10 +29,14 @@ const addKey = async (itemId: number, itemLabel: string, keyName: string) => {
 };
 
 export const ItemProperties: FC<Props> = props => {
-  const { data: itemKeys, refresh } = useDatabase('getItemKeysByItemId', [
-    props.itemId,
-  ]);
+  const { data: itemKeys, refresh: refreshItemKeys } = useDatabase(
+    'getItemKeysByItemId',
+    [props.itemId]
+  );
   const { openModal, closeModal } = useMainStore();
+  const { suggestedKeys } = useGroupsPageStore(s => ({
+    suggestedKeys: s.suggestedKeys,
+  }));
 
   if (itemKeys === null) {
     return (
@@ -52,7 +55,7 @@ export const ItemProperties: FC<Props> = props => {
         onConfirm={async keyName => {
           closeModal();
           addKey(props.itemId, props.itemLabel, keyName);
-          refresh();
+          refreshItemKeys();
         }}
       />
     );
@@ -74,7 +77,7 @@ export const ItemProperties: FC<Props> = props => {
             message: `Property "${key.name}" was successfully deleted`,
             autoClose: 3000,
           });
-          refresh();
+          refreshItemKeys();
         }}
       />
     );
@@ -100,7 +103,7 @@ export const ItemProperties: FC<Props> = props => {
             message: `"${itemKey.name}" was successfully renamed to "${name}"`,
             autoClose: 3000,
           });
-          refresh();
+          refreshItemKeys();
         }}
       />
     );
@@ -108,12 +111,12 @@ export const ItemProperties: FC<Props> = props => {
 
   const handleAddSuggestedKey = async (keyName: string) => {
     await addKey(props.itemId, props.itemLabel, keyName);
-    refresh();
+    refreshItemKeys();
   };
 
-  const suggestedKeys = SUGGESTED_PROPERTIES.reduce<string[]>((acc, cur) => {
-    if (itemKeys.find(k => k.name === cur)) return acc;
-    acc.push(cur);
+  const filteredSuggestedKeys = suggestedKeys.reduce<string[]>((acc, cur) => {
+    if (itemKeys.find(k => k.name === cur.name)) return acc;
+    acc.push(cur.name);
     return acc;
   }, []);
 
@@ -163,7 +166,7 @@ export const ItemProperties: FC<Props> = props => {
             Suggested:
           </Text>
         )}
-        {suggestedKeys.map(key => (
+        {filteredSuggestedKeys.map(key => (
           <Chip
             key={`suggested_key_${key}`}
             onClick={() => {

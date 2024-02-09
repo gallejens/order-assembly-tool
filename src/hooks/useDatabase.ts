@@ -1,5 +1,5 @@
-import { db } from '@/lib/db';
-import { QUERIES, type Queries } from '@/queries';
+import { executeSelectQuery } from '@/lib/db';
+import { type Queries } from '@/queries';
 import { useEffect, useRef, useState } from 'react';
 
 export const useDatabase = <T extends keyof Queries>(
@@ -14,16 +14,11 @@ export const useDatabase = <T extends keyof Queries>(
 
   const executeQuery = async () => {
     const promise = new Promise<Queries[T]>((res, rej) => {
-      const timeout: number | null = null;
-
       promiseResolveRej.current = () => {
-        if (timeout !== null) {
-          clearTimeout(timeout);
-        }
         rej('Cancelled');
       };
 
-      db.select<Queries[T]>(QUERIES[queryName], values).then(result => {
+      executeSelectQuery(queryName, values).then(result => {
         res(result);
       });
     });

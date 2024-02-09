@@ -11,11 +11,15 @@ export type Queries = {
   }[];
   getItemLabelById: [{ label: string }];
   getItemKeysByItemId: { id: number; name: string }[];
+  getSuggestedItemKeysForGroup: { id: number; name: string }[];
 };
 
 export const QUERIES: Record<keyof Queries, string> = {
   getGroups: 'SELECT * FROM groups ORDER BY position ASC;',
-  getItemsByGroupId: 'SELECT id, parentId, label FROM items WHERE groupId = $1',
+  getItemsByGroupId:
+    'SELECT id, parentId, label FROM items WHERE groupId = $1;',
   getItemLabelById: 'SELECT label FROM items WHERE id = $1 LIMIT 1;',
   getItemKeysByItemId: 'SELECT id, name FROM item_keys WHERE itemId = $1;',
+  getSuggestedItemKeysForGroup:
+    'SELECT id, name FROM suggested_item_keys WHERE groupId = $1;',
 };

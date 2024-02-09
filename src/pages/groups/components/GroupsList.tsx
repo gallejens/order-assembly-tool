@@ -5,18 +5,19 @@ import { OptionLabelBox } from '@/components/optionlabelbox';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
+import { SuggestedKeysModal } from '@/pages/groups/components/SuggestedKeysModal';
 import { useMainStore } from '@/stores/useMainStore';
 import { Loader, Text } from '@mantine/core';
 import {
   IconArrowBadgeDown,
   IconArrowBadgeUp,
+  IconEdit,
   IconForms,
   IconPlus,
   IconTrash,
 } from '@tabler/icons-react';
 import type { FC } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
-
 import styles from '../styles/groupslist.module.scss';
 
 export const GroupsList: FC = () => {
@@ -121,6 +122,13 @@ export const GroupsList: FC = () => {
     refresh();
   };
 
+  const handleEditSuggestedKeys = async (id: number) => {
+    const group = groups?.find(g => g.id === id);
+    if (!group) return;
+
+    openModal(<SuggestedKeysModal groupId={id} />);
+  };
+
   return (
     <Sidebar
       title='Groups'
@@ -150,6 +158,13 @@ export const GroupsList: FC = () => {
               icon: IconTrash,
               onClick: () => {
                 handleDeleteGroup(group.id);
+              },
+            },
+            {
+              label: 'Edit Suggested Properties',
+              icon: IconEdit,
+              onClick: () => {
+                handleEditSuggestedKeys(group.id);
               },
             },
           ];
