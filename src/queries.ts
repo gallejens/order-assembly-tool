@@ -12,6 +12,12 @@ export type Queries = {
   getItemLabelById: [{ label: string }];
   getItemKeysByItemId: { id: number; name: string }[];
   getSuggestedItemKeysForGroup: { id: number; name: string }[];
+  getProductIdsForItem: { id: number }[];
+  getProductValuesForItem: {
+    productId: number;
+    keyId: number;
+    value: string;
+  }[];
 };
 
 export const QUERIES: Record<keyof Queries, string> = {
@@ -22,4 +28,7 @@ export const QUERIES: Record<keyof Queries, string> = {
   getItemKeysByItemId: 'SELECT id, name FROM item_keys WHERE itemId = $1;',
   getSuggestedItemKeysForGroup:
     'SELECT id, name FROM suggested_item_keys WHERE groupId = $1;',
+  getProductIdsForItem: 'SELECT id FROM products WHERE itemId = $1;',
+  getProductValuesForItem:
+    'SELECT * FROM product_values WHERE productId IN (SELECT id FROM products WHERE itemId = $1);',
 };

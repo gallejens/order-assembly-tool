@@ -5,7 +5,7 @@ import { OptionLabelBox } from '@/components/optionlabelbox';
 import { Sidebar } from '@/components/sidebar';
 import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
-import { SuggestedKeysModal } from '@/pages/groups/components/SuggestedKeysModal';
+import { SuggestedKeysModal } from '@/pages/groups/modals/SuggestedKeysModal';
 import { useMainStore } from '@/stores/useMainStore';
 import { Loader, Text } from '@mantine/core';
 import {
