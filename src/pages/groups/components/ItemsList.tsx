@@ -1,4 +1,8 @@
-import { RetypConfirmModal, TextInputModal } from '@/components/modals';
+import {
+  ConfirmModal,
+  RetypConfirmModal,
+  TextInputModal,
+} from '@/components/modals';
 import { notifications } from '@/components/notifications';
 import { OptionLabelBox } from '@/components/optionlabelbox';
 import { Sidebar } from '@/components/sidebar';
@@ -7,24 +11,30 @@ import { db } from '@/lib/db';
 import type { Queries } from '@/queries';
 import { useMainStore } from '@/stores/useMainStore';
 import { Loader, Text } from '@mantine/core';
-import { IconForms, IconPlus, IconTrash } from '@tabler/icons-react';
-import { type FC } from 'react';
+import {
+  IconArrowsMoveVertical,
+  IconForms,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons-react';
+import { type FC, useState } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
 
 import styles from '../styles/itemslist.module.scss';
 
-type Item = {
-  id: number;
-  label: string;
-  children: Item[];
+type TreeItem = Queries['getItemsByGroupId'][number] & {
+  children: TreeItem[];
 };
 
-const findItemById = (items: Item[], id: number): Item | undefined => {
-  for (const item of items) {
-    if (item.id === id) return item;
+const findItemByIdInTree = (
+  treeItems: TreeItem[],
+  id: number
+): TreeItem | undefined => {
+  for (const treeItem of treeItems) {
+    if (treeItem.id === id) return treeItem;
 
-    if (item.children.length > 0) {
-      const foundItem = findItemById(item.children, id);
+    if (treeItem.children.length > 0) {
+      const foundItem = findItemByIdInTree(treeItem.children, id);
       if (foundItem) {
         return foundItem;
       }
@@ -32,34 +42,28 @@ const findItemById = (items: Item[], id: number): Item | undefined => {
   }
 };
 
-const groupItems = (items: Queries['getItemsByGroupId']) => {
+const buildItemTree = (items: Queries['getItemsByGroupId']) => {
   const itemsLeft = [...items];
-  const groupped: Item[] = [];
+  const groupped: TreeItem[] = [];
 
   let i = 0;
   while (itemsLeft.length > 0) {
     const item = itemsLeft[i];
 
-    if (item.parentId === null) {
-      groupped.push({
-        id: item.id,
-        label: item.label,
-        children: [],
-      });
-      itemsLeft.splice(i, 1);
-      continue;
+    let parent = groupped;
+
+    if (item.parentId !== null) {
+      const parentItem = findItemByIdInTree(groupped, item.parentId);
+      // parent might be not yet processed
+      if (!parentItem) {
+        i = (i + 1) % itemsLeft.length;
+        continue;
+      }
+      parent = parentItem.children;
     }
 
-    const parent = findItemById(groupped, item.parentId);
-    // parent might be not yet processed
-    if (!parent) {
-      i = (i + 1) % itemsLeft.length;
-      continue;
-    }
-
-    parent.children.push({
-      id: item.id,
-      label: item.label,
+    parent.push({
+      ...item,
       children: [],
     });
     itemsLeft.splice(i, 1);
@@ -75,6 +79,8 @@ export const ItemsList: FC = () => {
   const { data: items, refresh } = useDatabase('getItemsByGroupId', [
     selectedGroup,
   ]);
+
+  const [movingItemId, setMovingItemId] = useState<number | null>(null);
 
   const handleCreateItem = (parentId: number | null = null) => {
     const parentItemLabel =
@@ -156,13 +162,45 @@ export const ItemsList: FC = () => {
     );
   };
 
+  const handleMoveItem = (newParentId: number) => {
+    if (movingItemId === null) return;
+
+    const movingLabel = items?.find(i => i.id === movingItemId)?.label ?? '';
+    const parentLabel = items?.find(i => i.id === newParentId)?.label ?? '';
+
+    openModal(
+      <ConfirmModal
+        title={`Do you want to move "${movingLabel}" to "${parentLabel}"?`}
+        text='Caution: all filters of this item will be removed!'
+        onConfirm={async () => {
+          await db.execute('UPDATE items SET parentId = $1 WHERE id = $2;', [
+            newParentId,
+            movingItemId,
+          ]);
+          refresh();
+          closeModal();
+
+          // TODO: Remove filters of the moved item
+        }}
+      />
+    );
+
+    setMovingItemId(null);
+  };
+
   // extracted for recursions
-  const mapFunc = (item: Item) => (
+  const mapFunc = (item: TreeItem) => (
     <div key={`tree_item_${item.id}`} className={styles.children}>
       <OptionLabelBox
         onClick={() => {
-          if (item.id === selectedItem) return;
-          setSelectedItem(item.id);
+          if (movingItemId !== null && movingItemId !== item.id) {
+            handleMoveItem(item.id);
+            return;
+          }
+
+          if (item.id !== selectedItem) {
+            setSelectedItem(item.id);
+          }
         }}
         label={item.label}
         selected={selectedItem === item.id}
@@ -189,6 +227,13 @@ export const ItemsList: FC = () => {
               handleDeleteItem(item.id);
             },
           },
+          {
+            label: 'Move',
+            icon: IconArrowsMoveVertical,
+            onClick: () => {
+              setMovingItemId(item.id);
+            },
+          },
         ]}
       />
       {item.children.length > 0 && item.children.map(mapFunc)}
@@ -210,7 +255,7 @@ export const ItemsList: FC = () => {
           <Text size='sm'>No items found</Text>
         </span>
       ) : (
-        <div className={styles.tree}>{groupItems(items).map(mapFunc)}</div>
+        <div className={styles.tree}>{buildItemTree(items).map(mapFunc)}</div>
       )}
     </Sidebar>
   );
