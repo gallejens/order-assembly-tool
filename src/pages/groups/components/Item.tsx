@@ -74,7 +74,11 @@ export const Item: FC = () => {
       {selectedTab === undefined ? (
         <Loader />
       ) : (
-        <selectedTab.component itemId={itemId} itemLabel={itemLabel} />
+        <selectedTab.component
+          itemId={itemId}
+          itemLabel={itemLabel}
+          key={`item_${itemId}`}
+        />
       )}
     </div>
   );
