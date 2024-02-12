@@ -37,7 +37,7 @@ pub const MIGRATIONS: [Migration; 4] = [
     CREATE TABLE IF NOT EXISTS `product_values` (
       `productId` INTEGER NOT NULL,
       `keyId` INTEGER NOT NULL,
-      `value` TEXT NOT NULL,
+      `value` TEXT,
       PRIMARY KEY (`productId`, `keyId`),
       FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON UPDATE CASCADE ON DELETE CASCADE,
       FOREIGN KEY (`keyId`) REFERENCES `item_keys`(`id`) ON UPDATE CASCADE ON DELETE CASCADE
