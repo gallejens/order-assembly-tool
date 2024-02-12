@@ -1,4 +1,4 @@
-import { RetypConfirmModal, TextInputModal } from '@/components/modals';
+import { ConfirmModal, TextInputModal } from '@/components/modals';
 import { notifications } from '@/components/notifications';
 import { OptionLabelBox } from '@/components/optionlabelbox';
 import { Resizeable } from '@/components/resizeable';
@@ -6,7 +6,12 @@ import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
 import { useMainStore } from '@/stores/useMainStore';
 import { Button, Center, Chip, Loader, Text } from '@mantine/core';
-import { IconForms, IconTrash } from '@tabler/icons-react';
+import {
+  IconArrowBadgeDown,
+  IconArrowBadgeUp,
+  IconForms,
+  IconTrash,
+} from '@tabler/icons-react';
 import type { FC } from 'react';
 import { useGroupsPageStore } from '../stores/useGroupsPage';
 import styles from '../styles/itemproperties.module.scss';
@@ -14,18 +19,6 @@ import styles from '../styles/itemproperties.module.scss';
 type Props = {
   itemId: number;
   itemLabel: string;
-};
-
-const addKey = async (itemId: number, itemLabel: string, keyName: string) => {
-  await db.execute('INSERT INTO item_keys (itemId, name) VALUES ($1, $2);', [
-    itemId,
-    keyName,
-  ]);
-  notifications.add({
-    title: 'Property Added',
-    message: `Property "${keyName}" was successfully added to "${itemLabel}"`,
-    autoClose: 3000,
-  });
 };
 
 export const ItemProperties: FC<Props> = props => {
@@ -45,6 +38,20 @@ export const ItemProperties: FC<Props> = props => {
       </div>
     );
   }
+
+  const addKey = async (itemId: number, itemLabel: string, keyName: string) => {
+    console.log(itemKeys);
+    const position = (itemKeys[itemKeys.length - 1]?.position ?? 0) + 1;
+    await db.execute(
+      'INSERT INTO item_keys (itemId, name, position) VALUES ($1, $2, $3);',
+      [itemId, keyName, position]
+    );
+    notifications.add({
+      title: 'Property Added',
+      message: `Property "${keyName}" was successfully added to "${itemLabel}"`,
+      autoClose: 3000,
+    });
+  };
 
   const handleAddKey = () => {
     openModal(
@@ -66,9 +73,8 @@ export const ItemProperties: FC<Props> = props => {
     if (!key) return;
 
     openModal(
-      <RetypConfirmModal
+      <ConfirmModal
         title={`Delete property "${key.name}"`}
-        confirmValue={key.name}
         onConfirm={async () => {
           closeModal();
           await db.execute('DELETE FROM item_keys WHERE id = $1', [id]);
@@ -109,6 +115,23 @@ export const ItemProperties: FC<Props> = props => {
     );
   };
 
+  const handleKeyPositionChange = async (id: number, movement: 1 | -1) => {
+    const idx = itemKeys.findIndex(g => g.id === id);
+    const swappingIdx = idx + movement;
+
+    await db.execute(
+      'UPDATE item_keys SET position = CASE id WHEN $1 THEN $2 WHEN $3 then $4 END WHERE ID in ($1, $3);',
+      [
+        id,
+        itemKeys[swappingIdx].position,
+        itemKeys[swappingIdx].id,
+        itemKeys[idx].position,
+      ]
+    );
+
+    refreshItemKeys();
+  };
+
   const handleAddSuggestedKey = async (keyName: string) => {
     await addKey(props.itemId, props.itemLabel, keyName);
     refreshItemKeys();
@@ -128,28 +151,52 @@ export const ItemProperties: FC<Props> = props => {
             <Text>No properties found</Text>
           </Center>
         ) : (
-          itemKeys.map(key => (
-            <OptionLabelBox
-              key={`item_key_${key.id}`}
-              label={key.name}
-              options={[
-                {
-                  label: 'Rename',
-                  icon: IconForms,
-                  onClick: () => {
-                    handleRenameGroup(key.id);
-                  },
+          itemKeys.map((key, idx) => {
+            const options = [
+              {
+                label: 'Rename',
+                icon: IconForms,
+                onClick: () => {
+                  handleRenameGroup(key.id);
                 },
-                {
-                  label: 'Delete',
-                  icon: IconTrash,
-                  onClick: () => {
-                    handleDeleteKey(key.id);
-                  },
+              },
+              {
+                label: 'Delete',
+                icon: IconTrash,
+                onClick: () => {
+                  handleDeleteKey(key.id);
                 },
-              ]}
-            />
-          ))
+              },
+            ];
+
+            if (idx !== 0) {
+              options.push({
+                label: 'Move Up',
+                icon: IconArrowBadgeUp,
+                onClick: () => {
+                  handleKeyPositionChange(key.id, -1);
+                },
+              });
+            }
+
+            if (idx !== itemKeys.length - 1) {
+              options.push({
+                label: 'Move Down',
+                icon: IconArrowBadgeDown,
+                onClick: () => {
+                  handleKeyPositionChange(key.id, 1);
+                },
+              });
+            }
+
+            return (
+              <OptionLabelBox
+                key={`item_key_${key.id}`}
+                label={key.name}
+                options={options}
+              />
+            );
+          })
         )}
       </div>
       <Resizeable

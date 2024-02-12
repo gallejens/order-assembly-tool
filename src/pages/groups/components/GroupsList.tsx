@@ -62,9 +62,10 @@ export const GroupsList: FC = () => {
         buttonLabel='Create'
         onConfirm={async label => {
           closeModal();
+          const position = (groups[groups.length - 1]?.position ?? 0) + 1;
           await db.execute(
             'INSERT INTO groups (label, position) VALUES ($1, $2);',
-            [label, groups[groups.length - 1].position + 1]
+            [label, position]
           );
           notifications.add({
             title: 'Group Created',

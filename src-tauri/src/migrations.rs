@@ -3,7 +3,7 @@ pub struct Migration<'a> {
     pub sql: &'a str,
 }
 
-pub const MIGRATIONS: [Migration; 4] = [
+pub const MIGRATIONS: [Migration; 5] = [
     Migration {
         description: "create_initial_tables",
         sql: "
@@ -60,5 +60,11 @@ pub const MIGRATIONS: [Migration; 4] = [
       FOREIGN KEY(`groupId`) REFERENCES `groups`(`id`) ON UPDATE CASCADE ON DELETE CASCADE
     );
     ",
+    },
+    Migration {
+        description: "add_item_key_position",
+        sql: "
+    ALTER TABLE `item_keys` ADD COLUMN `position` INTEGER NOT NULL DEFAULT 0;
+      ",
     },
 ];
