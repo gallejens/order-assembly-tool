@@ -10,7 +10,7 @@ import { useDatabase } from '@/hooks/useDatabase';
 import { db } from '@/lib/db';
 import type { Queries } from '@/queries';
 import { useMainStore } from '@/stores/useMainStore';
-import { Loader, Text } from '@mantine/core';
+import { Button, Loader, Stack, Text } from '@mantine/core';
 import {
   IconArrowsMoveVertical,
   IconForms,
@@ -162,11 +162,13 @@ export const ItemsList: FC = () => {
     );
   };
 
-  const handleMoveItem = (newParentId: number) => {
+  const handleMoveItem = (newParentId: number | null) => {
     if (movingItemId === null) return;
 
-    const movingLabel = items?.find(i => i.id === movingItemId)?.label ?? '';
-    const parentLabel = items?.find(i => i.id === newParentId)?.label ?? '';
+    const movingLabel =
+      items?.find(i => i.id === movingItemId)?.label ?? 'unknown item';
+    const parentLabel =
+      items?.find(i => i.id === newParentId)?.label ?? 'new category';
 
     openModal(
       <ConfirmModal
@@ -189,56 +191,65 @@ export const ItemsList: FC = () => {
   };
 
   // extracted for recursions
-  const mapFunc = (item: TreeItem) => (
-    <div key={`tree_item_${item.id}`} className={styles.children}>
-      <OptionLabelBox
-        onClick={() => {
-          if (movingItemId !== null && movingItemId !== item.id) {
-            handleMoveItem(item.id);
-            return;
-          }
+  const mapFunc = (item: TreeItem) => {
+    const options = [
+      {
+        label: 'Add Subitem',
+        icon: IconPlus,
+        onClick: () => {
+          handleCreateItem(item.id);
+        },
+      },
+      {
+        label: 'Rename',
+        icon: IconForms,
+        onClick: () => {
+          handleRenameItem(item.id);
+        },
+      },
+      {
+        label: 'Delete',
+        icon: IconTrash,
+        onClick: () => {
+          handleDeleteItem(item.id);
+        },
+      },
+    ];
 
-          if (item.id !== selectedItem) {
-            setSelectedItem(item.id);
-          }
-        }}
-        label={item.label}
-        selected={selectedItem === item.id}
-        className={styles.tree_item}
-        options={[
-          {
-            label: 'Add Subitem',
-            icon: IconPlus,
-            onClick: () => {
-              handleCreateItem(item.id);
-            },
-          },
-          {
-            label: 'Rename',
-            icon: IconForms,
-            onClick: () => {
-              handleRenameItem(item.id);
-            },
-          },
-          {
-            label: 'Delete',
-            icon: IconTrash,
-            onClick: () => {
-              handleDeleteItem(item.id);
-            },
-          },
-          {
-            label: 'Move',
-            icon: IconArrowsMoveVertical,
-            onClick: () => {
-              setMovingItemId(item.id);
-            },
-          },
-        ]}
-      />
-      {item.children.length > 0 && item.children.map(mapFunc)}
-    </div>
-  );
+    if (movingItemId === null) {
+      options.push({
+        label: 'Move',
+        icon: IconArrowsMoveVertical,
+        onClick: () => {
+          setMovingItemId(item.id);
+        },
+      });
+    }
+
+    return (
+      <div key={`tree_item_${item.id}`} className={styles.children}>
+        <OptionLabelBox
+          onClick={() => {
+            if (movingItemId !== null) {
+              if (movingItemId !== item.id) {
+                handleMoveItem(item.id);
+              }
+              return;
+            }
+
+            if (item.id !== selectedItem) {
+              setSelectedItem(item.id);
+            }
+          }}
+          label={item.label}
+          selected={selectedItem === item.id}
+          className={styles.tree_item}
+          options={options}
+        />
+        {item.children.length > 0 && item.children.map(mapFunc)}
+      </div>
+    );
+  };
 
   return (
     <Sidebar
@@ -255,7 +266,28 @@ export const ItemsList: FC = () => {
           <Text size='sm'>No items found</Text>
         </span>
       ) : (
-        <div className={styles.tree}>{buildItemTree(items).map(mapFunc)}</div>
+        <div className={styles.tree}>
+          {buildItemTree(items).map(mapFunc)}
+          {movingItemId !== null && (
+            <Stack>
+              <Button
+                onClick={() => {
+                  handleMoveItem(null);
+                }}
+              >
+                New category
+              </Button>
+              <Button
+                onClick={() => {
+                  setMovingItemId(null);
+                }}
+                color='red'
+              >
+                Cancel
+              </Button>
+            </Stack>
+          )}
+        </div>
       )}
     </Sidebar>
   );
